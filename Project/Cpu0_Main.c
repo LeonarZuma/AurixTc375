@@ -40,9 +40,8 @@
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
-#define TICK_VAL            (10U)       /* Tick Val 10ms */
-#define TASK1_VAL           (5U)        /* 5 times TickVal */
-#define TASK2_VAL           (10U)        /* 5 times TickVal */
+#define TICK_VAL            (5U)            /* Tick Val 5ms */
+#define TASK1_VAL           (2U)            /* 5 times TickVal */
 #define QUEUE_BUFFER_SIZE   (18U)
 
 /*STM0 module*/
@@ -70,8 +69,7 @@ void core0_main(void)
     /* Init queue Function call */
     AppQueue_initQueue(&shared_queue);
 
-    uint64 Timeout_50ms;
-    uint64 Timeout_20ms;
+    uint64 Timeout_10ms;
 
     /* Task ID creation */
     Sche_core0.tick = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, TICK_VAL);
@@ -85,11 +83,10 @@ void core0_main(void)
 
     AppSched_initScheduler(&Sche_core0);
 
-    /*get the number of ticks corresponding to 20ms and 50ms*/
-    Timeout_50ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
+    /*get the number of ticks corresponding to 10ms */
+    Timeout_10ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
 
-    //AppSched_registerTask(&Sche_core0, Mouse_InitTask, Mouse_PeriodicTask, Timeout_50ms);
-    AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_50ms);
+    AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_10ms);
 
     /* no ponerle nombre de task a las funciones auxiliares de las tareas */
 
