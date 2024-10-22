@@ -1,5 +1,5 @@
-#ifndef SERIAL_H__
-#define SERIAL_H__
+#ifndef SERIAL_H_
+#define SERIAL_H_
 
 void AppSerial_initTask( void );
 
