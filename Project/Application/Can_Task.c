@@ -154,7 +154,6 @@ void PeriodicCanTask_Core0(void)
  * only valid messages with the ID of 0x177 will be take them into account due the configured filter */
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 {
-    uint32 index = 0;
     /* Clear the "Message stored to Dedicated RX Buffer" interrupt flag */
     IfxCan_Node_clearInterruptFlag(Can_Node.node, IfxCan_Interrupt_rxFifo0Full);
     

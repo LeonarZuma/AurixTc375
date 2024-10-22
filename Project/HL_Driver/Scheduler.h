@@ -27,6 +27,7 @@
 #define SCHEDULER_H_
 
 #define IFX_INTPRIO_STM0_CMP0    10
+#define SCHD_INT_MODE ACTIVE
 
 /**
   * @brief    Task control block structure

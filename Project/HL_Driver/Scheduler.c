@@ -46,6 +46,7 @@ static AppSched_Scheduler *intScheduler0 = NULL;
 static AppSched_Scheduler *intScheduler1 = NULL;
 static AppSched_Scheduler *intScheduler2 = NULL;
 
+#ifdef SCHD_INT_MODE
 /**
  * @brief   **calculates the current time passed on milliseconds **
  *
@@ -60,6 +61,7 @@ static long milliseconds( void )
 {
     return IfxStm_get( &MODULE_STM0 );
 }
+#endif
 
 /**
  * @brief   ** Execute the init Functions for every registered task **
@@ -403,8 +405,11 @@ void AppSched_startScheduler(AppSched_Scheduler *scheduler)
     #endif
     {
         /* Check if the tick count has been reach */
-        if(scheduler->tickFlag == TRUE)
-        //if((milliseconds() - tickstart) >= scheduler->tick)
+        #ifdef SCHD_INT_MODE
+            if(scheduler->tickFlag == TRUE)
+        #else 
+            if((milliseconds() - tickstart) >= scheduler->tick)
+        #endif
         {
             scheduler->tickFlag = FALSE;
             /* This is the total time in ms that has passed since the scheduler started, to check the timeout condition */
