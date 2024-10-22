@@ -32,13 +32,11 @@
 #include "IfxPort_Io.h"
 #include "IfxStm.h"
 
-#include "Button.h"
 #include "Queue.h"
 #include "Scheduler.h"
 
-#include "App_bsp.h"
-#include "Mouse.h"
-#include "Leds.h"
+#include "bsp.h"
+#include "AppSerial.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
@@ -61,13 +59,13 @@ IFX_ALIGN(4) AppQue_Queue shared_queue;
 
 void core0_main(void)
 {
-    AppMsg_Message buffer[QUEUE_BUFFER_SIZE];
+    App_Message buffer[QUEUE_BUFFER_SIZE];
     /* Set the buffer for the Queue */
     shared_queue.buffer = (void*)buffer;
     /* Queue lenght must be the same or less than the buffer size */
     shared_queue.elements = QUEUE_BUFFER_SIZE;
     /* The size of a single element */
-    shared_queue.size = sizeof(AppMsg_Message);
+    shared_queue.size = sizeof(App_Message);
 
     /* Init queue Function call */
     AppQueue_initQueue(&shared_queue);
@@ -91,7 +89,7 @@ void core0_main(void)
     Timeout_50ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
 
     //AppSched_registerTask(&Sche_core0, Mouse_InitTask, Mouse_PeriodicTask, Timeout_50ms);
-    AppSched_registerTask(&Sche_core0, Leds_InitTask, Leds_PeriodicTask, Timeout_50ms);
+    AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_50ms);
 
     /* no ponerle nombre de task a las funciones auxiliares de las tareas */
 
