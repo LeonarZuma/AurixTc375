@@ -1,0 +1,39 @@
+; --------------------------------------------------------------------------------
+; initialize and start the debugger
+RESet
+SYStem.CPU TC375TP
+CORE.ASSIGN 1. 2. 3. // assign cores to the SMP system
+SYStem.Up
+
+; optional settings:
+SYStem.Option DUALPORT ON
+SETUP.Var %SpotLight
+MAP.BOnchip 0x0--0xffffffff // force onchip-breakpoints
+
+; --------------------------------------------------------------------------------
+; Flash programming
+; prepare flash programming (declarations)
+DO ~~/demo/tricore/flash/tc37x.cmm CPU=TC375TP PREPAREONLY
+
+; enable flash programming
+FLASH.ReProgram ALL
+
+; load demo application (this is the route for makefile Studio)
+Data.LOAD.Elf "..\Build\Test.elf"
+; load demo application (this is the route for AURIX Studio)
+; Data.LOAD.Elf "TriCore Debug (TASKING)/Test.elf"
+
+FLASH.ReProgram OFF
+
+; Display code only in C
+Mode.HLL
+
+; list code for the rest of the cores 
+List.auto /CORE 0.
+List.auto /CORE 1.
+List.auto /CORE 2.
+
+; Run until main function from core 0 
+Go core0_main
+
+ENDDO
