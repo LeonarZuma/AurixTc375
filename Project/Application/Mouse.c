@@ -36,7 +36,6 @@ void Mouse_PeriodicTask(void)
 static void DoubleClick_stMachine(AppBtns_Buttons *btn_clickCnfg)
 {
     AppMsg_Message data2Write;
-    uint8_t msg_rdy = FALSE;
 
     switch(btn_clickCnfg->state)
     {
