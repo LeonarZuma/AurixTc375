@@ -1,0 +1,1 @@
+C:\DevApp\T32-USB_2023-02\bin\windows64\t32mtc.exe -c trace32_config\config.t32 -s trace32_config\flash_script.cmm &
