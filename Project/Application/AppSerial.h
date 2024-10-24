@@ -21,6 +21,17 @@ typedef struct _App_Pdu // Protocol Data Unit
     uint8  sdu[8];  // Service Data Unit
 } App_Pdu;
 
+typedef enum
+{
+    IDLE = 0,
+    MESSAGE,
+    TIME,
+    DATE,
+    ALARM,
+    ERROR,
+    OK
+} SSM_States;
+
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
 /*----------------------------------------------------------------------------*/
