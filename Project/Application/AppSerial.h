@@ -11,9 +11,15 @@
 #define TX_MSG_NO               (3U)
 #define MSG_PDU_BYTES           (8U)
 #define ISR_PRIORITY_CAN_RX     (1)
+#define QUEUE_BUFFER_SIZE       (8U)
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
+typedef struct _App_Pdu // Protocol Data Unit
+{
+    uint32 pci;     // Protocol Control Information
+    uint8  sdu[8];  // Service Data Unit
+} App_Pdu;
 
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
