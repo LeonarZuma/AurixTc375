@@ -126,7 +126,7 @@ static void CAN_Init(void)
     Can_Node_Config.frame.mode        = IfxCan_FrameMode_fdLong;//Classic mode, 8 bytes frames
     Can_Node_Config.frame.type        = IfxCan_FrameType_transmitAndReceive;//define the frame to be the transmitting one
     
-    Can_Node_Config.interruptConfig.rxFifo0FullEnabled                      = TRUE; //once the message is stored in the dedicated RX buffer, raise the interrupt
+    Can_Node_Config.interruptConfig.rxFifo0NewMessageEnabled                = TRUE;                         /*!< Once the message is stored in the FIFO RX buffer, raise the interrupt */
     Can_Node_Config.interruptConfig.rxf0f.priority                          = ISR_PRIORITY_CAN_RX;           //define the transmission complete interrupt priority
     Can_Node_Config.interruptConfig.rxf0f.interruptLine                     = IfxCan_InterruptLine_1;   //assign the interrupt line 1 to the receive interrupt
     Can_Node_Config.interruptConfig.rxf0f.typeOfService                     = IfxSrc_Tos_cpu0;          //receive interrupt service routine should be serviced by the CPU0
@@ -134,7 +134,7 @@ static void CAN_Init(void)
     Can_Node_Config.rxConfig.rxMode                                         = IfxCan_RxMode_fifo0;          /*!< Setting the Rx mode as FIFO 1  */
     Can_Node_Config.rxConfig.rxFifo0DataFieldSize                           = IfxCan_DataFieldSize_8;       /*!< Datafield 8 */
     Can_Node_Config.rxConfig.rxFifo0Size                                    = 3u;                          /*!< FIFO with 3 elements */
-    Can_Node_Config.rxConfig.rxFifo0OperatingMode                           = IfxCan_RxFifoMode_blocking;  /*! FIFO set as blocking */
+    Can_Node_Config.rxConfig.rxFifo0OperatingMode                           = IfxCan_RxFifoMode_overwrite;  /*! FIFO set as overwriting */
 
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &Can_Node, &Can_Node_Config );
