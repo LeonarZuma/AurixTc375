@@ -72,21 +72,21 @@ void AppSerial_periodicTask( void )
 
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 {
-    App_Pdu data2Read;
+    App_Pdu data2Write;
 
     /*!< Clear the "Rx FIFO New message" interrupt flag */
     IfxCan_Node_clearInterruptFlag(Can_Node.node, IfxCan_Interrupt_rxFifo0NewMessage);
 
     /*!< Read the received CAN message */
-    IfxCan_Can_readMessage(&Can_Node, &Rx_Message, (uint32*)&data2Read.sdu);
+    IfxCan_Can_readMessage(&Can_Node, &Rx_Message, (uint32*)&data2Write.sdu);
 
-    Serial_singleFrameRx( &data2Read.sdu, &data2Read.pci);
+    Serial_singleFrameRx( &data2Write.sdu, &data2Write.pci);
     
     /*!< set a breakpoint after the function  and see the message received using the debugger */
     messageFlag = 1u;
 
     /* Send message to queue*/
-    AppQueue_writeDataIsr(&can2ssm_queue, &data2Read);
+    AppQueue_writeDataIsr(&can2ssm_queue, &data2Write);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -202,6 +202,31 @@ static void Queue_CAN2SSM_Init(void)
 
 static void Serial_State_Machine(void)
 {
-    App_Pdu data2Write;
+    /* define the init SSM state */
+    SSM_States current_state = IDLE;
+    /* create a queue message container */
+    App_Pdu data2Read;
+
     /* switch case */
+    switch (current_state)
+    {
+        case IDLE:
+
+        case MESSAGE:
+
+        case TIME:
+
+        case DATE:
+
+        case ALARM:
+
+        case ERROR:
+            break;
+            
+        case OK:
+            break;
+
+        default:
+            break;
+    }
 }
