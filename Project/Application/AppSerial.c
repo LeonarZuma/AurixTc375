@@ -30,6 +30,9 @@ IFX_CONST IfxCan_Can_Pins Can_Pins =
     .padDriver  = IfxPort_PadDriver_cmosAutomotiveSpeed4
 };
 
+
+AppQue_Queue can2ssm_queue;
+
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
@@ -45,12 +48,67 @@ static uint8_t Serial_validateLeapYear( uint32_t year );
 
 static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year );
 
+static void CAN_Init(void);
+
+static void Queue_CAN2SSM_Init(void);
+
+static void Serial_State_Machine(void);
+
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
 /*----------------------------------------------------------------------------*/
 
 
 void AppSerial_initTask( void )
+{
+    CAN_Init();
+    Queue_CAN2SSM_Init();
+}
+
+void AppSerial_periodicTask( void )
+{
+    
+}
+
+/*----------------------------------------------------------------------------*/
+/*                         Implementation of local functions                  */
+/*----------------------------------------------------------------------------*/
+static void Serial_singleFrameTx( uint8_t *data, uint8_t size )
+{
+    
+}
+    
+static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
+{
+    uint8_t local_validation = 0;
+    return local_validation;
+}
+
+static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t seconds )
+{
+    uint8_t local_validation = 0;
+    return local_validation;
+}
+
+static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
+{
+    uint8_t local_validation = 0;
+    return local_validation;
+}
+
+static uint8_t Serial_validateLeapYear( uint32_t year )
+{
+    uint8_t local_validation = 0;
+    return local_validation;
+}
+
+static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year )
+{
+    uint8_t local_validation = 0;
+    return local_validation;
+}
+
+static void CAN_Init(void)
 {
     /*load default CAN module configuration into configuration structure*/
     IfxCan_Can_initModuleConfig( &Can_Config, &MODULE_CAN1 );
@@ -109,40 +167,22 @@ void AppSerial_initTask( void )
     IfxCan_Can_setStandardFilter( &Can_Node, &Can_Dst_Filter );
 }
 
-void AppSerial_periodicTask( void )
+static void Queue_CAN2SSM_Init(void)
 {
-    
+    App_Pdu buffer[QUEUE_BUFFER_SIZE];
+    /* Set the buffer for the Queue */
+    can2ssm_queue.buffer = (void*)buffer;
+    /* Queue lenght must be the same or less than the buffer size */
+    can2ssm_queue.elements = QUEUE_BUFFER_SIZE;
+    /* The size of a single element */
+    can2ssm_queue.size = sizeof(App_Pdu);
+
+    /* Init queue Function call */
+    AppQueue_initQueue(&can2ssm_queue);
 }
 
-/*----------------------------------------------------------------------------*/
-/*                         Implementation of local functions                  */
-/*----------------------------------------------------------------------------*/
-static void Serial_singleFrameTx( uint8_t *data, uint8_t size )
+static void Serial_State_Machine(void)
 {
 
-}
-    
-static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
-{
-
-}
-
-static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t seconds )
-{
-
-}
-
-static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
-{
-
-}
-
-static uint8_t Serial_validateLeapYear( uint32_t year )
-{
-
-}
-
-static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year )
-{
-
+    /* switch case */
 }

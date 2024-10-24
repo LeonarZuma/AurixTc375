@@ -79,7 +79,6 @@ void core0_main(void)
     Sche_core0.timerPtr = timers;
     Sche_core0.moduleStm = &MODULE_STM0;
     Sche_core0.stm = STM0;
-    
 
     AppSched_initScheduler(&Sche_core0);
 
@@ -87,8 +86,6 @@ void core0_main(void)
     Timeout_10ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
 
     AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_10ms);
-
-    /* no ponerle nombre de task a las funciones auxiliares de las tareas */
 
     /* !!WATCHDOG0 AND SAFETY WATCHDOG ARE DISABLED HERE!!
      * Enable the watchdogs and service them periodically if it is required */
