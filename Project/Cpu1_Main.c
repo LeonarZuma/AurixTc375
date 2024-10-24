@@ -96,8 +96,6 @@ void core1_main(void)
     /*get the number of ticks corresponding to 1000ms*/
     Timeout_100ms = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM1, (TICK_VAL * TASK1_VAL));
 
-    // AppSched_registerTask(&Sche_core1, Leds_InitTask, Leds_PeriodicTask, Timeout_100ms);
-    AppSched_registerTask(&Sche_core1, InitCanTask_Core0, PeriodicCanTask_Core0, Timeout_100ms);
 
     /* no ponerle nombre de task a las funciones auxiliares de las tareas */
 
