@@ -206,7 +206,11 @@ static void Serial_State_Machine(void)
     SSM_States current_state = IDLE;
     /* create a queue message container */
     App_Pdu data2Read;
+    /* create a queue message container for the Tx queue that is sharing the message time configurationn */
+    
+    /* if data in queue, keep reading until queue buffer is empty */
 
+    /* execute the complete state machine from begining to end for every message in buffer */
     /* switch case */
     switch (current_state)
     {
@@ -222,7 +226,7 @@ static void Serial_State_Machine(void)
 
         case ERROR:
             break;
-            
+
         case OK:
             break;
 
