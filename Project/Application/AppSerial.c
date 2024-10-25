@@ -80,6 +80,8 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
     /*!< Read the received CAN message */
     IfxCan_Can_readMessage(&Can_Node, &Rx_Message, (uint32*)&data2Write.sdu);
 
+    data2Write.pci = Rx_Message.messageId;
+
     Serial_singleFrameRx( &data2Write.sdu, &data2Write.pci);
     
     /*!< set a breakpoint after the function  and see the message received using the debugger */
