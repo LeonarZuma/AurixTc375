@@ -67,7 +67,10 @@ void AppSerial_initTask( void )
 
 void AppSerial_periodicTask( void )
 {
-    while (AppQueue_readDataMutex(&can2ssm_queue, &data2Read, MUTEX_uS_WAIT) == TRUE)
+    /* create a queue message container */
+    App_Pdu data2Read;
+    /* while the queue is not empty, read and execute all message in queue */
+    while (AppQueue_readDataIsr(&can2ssm_queue, &data2Read) == TRUE)
     {
         Serial_State_Machine();
     }
@@ -189,7 +192,7 @@ static void CAN_Init(void)
     /*Configure the reception filter to accept only 0x111, 0x112 and 0x113 IDs*/
     Can_Dst_Filter.number               = 0u;
     Can_Dst_Filter.type                 = IfxCan_FilterType_range;
-    Can_Dst_Filter.elementConfiguration = IfxCan_FilterElementConfiguration_storeInRxBuffer;
+    Can_Dst_Filter.elementConfiguration = IfxCan_FilterElementConfiguration_storeInRxFifo0;
     Can_Dst_Filter.id1                  = 0x111;
     Can_Dst_Filter.id2                  = 0x113;
     Can_Dst_Filter.rxBufferOffset       = IfxCan_RxBufferId_0;
@@ -212,9 +215,6 @@ static void Queue_CAN2SSM_Init(void)
 
 static void Serial_State_Machine(void)
 {
-    /* create a queue message container */
-    App_Pdu data2Read;
-
     /* define the init SSM state */
     SSM_States current_state = IDLE;
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
