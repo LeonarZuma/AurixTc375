@@ -67,7 +67,10 @@ void AppSerial_initTask( void )
 
 void AppSerial_periodicTask( void )
 {
-    
+    while (AppQueue_readDataMutex(&can2ssm_queue, &data2Read, MUTEX_uS_WAIT) == TRUE)
+    {
+        Serial_State_Machine();
+    }
 }
 
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
@@ -209,35 +212,38 @@ static void Queue_CAN2SSM_Init(void)
 
 static void Serial_State_Machine(void)
 {
-    /* define the init SSM state */
-    SSM_States current_state = IDLE;
     /* create a queue message container */
     App_Pdu data2Read;
+
+    /* define the init SSM state */
+    SSM_States current_state = IDLE;
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
     
     /* if data in queue, keep reading until queue buffer is empty */
-
-    /* execute the complete state machine from begining to end for every message in buffer */
-    /* switch case */
-    switch (current_state)
+    do
     {
-        case IDLE:
+        /* execute the complete state machine from begining to end for every message in buffer */
+        /* switch case */
+        switch (current_state)
+        {
+            case IDLE:
 
-        case MESSAGE:
+            case MESSAGE:
 
-        case TIME:
+            case TIME:
 
-        case DATE:
+            case DATE:
 
-        case ALARM:
+            case ALARM:
 
-        case ERROR:
-            break;
+            case ERROR:
+                break;
 
-        case OK:
-            break;
+            case OK:
+                break;
 
-        default:
-            break;
-    }
+            default:
+                break;
+        }
+    }while(current_state == IDLE);
 }
