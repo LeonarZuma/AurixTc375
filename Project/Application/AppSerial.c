@@ -157,6 +157,9 @@ static void CAN_Init(void)
     Can_Node_Config.rxConfig.rxFifo0Size                                    = 3u;                          /*!< FIFO with 3 elements */
     Can_Node_Config.rxConfig.rxFifo0OperatingMode                           = IfxCan_RxFifoMode_overwrite;  /*! FIFO set as overwriting */
 
+    /* Configure global filtering */
+    Can_Node_Config.filterConfig.standardFilterForNonMatchingFrames = IfxCan_NonMatchingFrame_reject;
+
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &Can_Node, &Can_Node_Config );
 
@@ -180,10 +183,12 @@ static void CAN_Init(void)
     Rx_Message.frameMode        = IfxCan_FrameMode_fdLong;        /*!< Frame mod as standard, we  can change it to FD */
     Rx_Message.readFromRxFifo0  = TRUE;                             /*!< Read from the FIFO 1 */
 
-    /*Configure the reception filter to accept only 0x177 IDs*/
+    /*Configure the reception filter to accept only 0x111, 0x112 and 0x113 IDs*/
     Can_Dst_Filter.number               = 0u;
+    Can_Dst_Filter.type                 = IfxCan_FilterType_range;
     Can_Dst_Filter.elementConfiguration = IfxCan_FilterElementConfiguration_storeInRxBuffer;
-    Can_Dst_Filter.id1                  = 0x177;
+    Can_Dst_Filter.id1                  = 0x111;
+    Can_Dst_Filter.id2                  = 0x113;
     Can_Dst_Filter.rxBufferOffset       = IfxCan_RxBufferId_0;
     IfxCan_Can_setStandardFilter( &Can_Node, &Can_Dst_Filter );
 }
