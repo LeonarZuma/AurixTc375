@@ -52,6 +52,8 @@ static void CAN_Init(void);
 
 static void Queue_CAN2SSM_Init(void);
 
+static uint16_t YearPdu_ToAppMessage(uint8_t* year);
+
 static void Serial_State_Machine(void);
 
 /*----------------------------------------------------------------------------*/
@@ -209,6 +211,11 @@ static void Queue_CAN2SSM_Init(void)
     AppQueue_initQueue(&can2ssm_queue);
 }
 
+static uint16_t YearPdu_ToAppMessage(uint8_t* year)
+{
+    return ((year[0]) | (year[1])<<8);
+}
+
 static void Serial_State_Machine(void)
 {
     /* create a queue message container to write for the rtcc queue */
@@ -222,6 +229,9 @@ static void Serial_State_Machine(void)
 
     /* to check the queue current state */
     uint8_t message_in_queue = FALSE;
+
+    /* to convert 2 bytes array to a single 16 bits value */
+    uint16_t year = 0;
 
     /* to chekc if the receive date is a valid one */
     uint8_t valid_date = 0;
@@ -288,9 +298,10 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case DATE:
+                year = YearPdu_ToAppMessage(data2Read.sdu[YR0]);
                 /* check if the receive date is a valid one */
-                valid_date = Serial_validateDate();
-                valid_year  = Serial_validateLeapYear();
+                valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
+                valid_year  = Serial_validateLeapYear(year);
                 if (valid_date == TRUE)
                 {
                     /* Change state to OK */
