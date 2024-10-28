@@ -276,7 +276,6 @@ static void Serial_State_Machine(void)
 
     /* to chekc if the receive date is a valid one */
     uint8_t valid_date = 0;
-    uint8_t valid_year = 0;
 
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
     
@@ -342,11 +341,16 @@ static void Serial_State_Machine(void)
                 year = YearPdu_ToAppMessage(&data2Read.sdu[YR1]);
                 /* check if the receive date is a valid one */
                 valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
-                valid_year  = Serial_validateLeapYear(year);
                 if (valid_date == TRUE)
                 {
                     /* Change state to OK */
                     current_state = OK;
+
+                    /* Build the message to queue for the RTCC of type TIME */
+                    data2Write.tm.tm_mday = data2Read.sdu[DAY];
+                    data2Write.tm.tm_mon = data2Read.sdu[MO];
+                    data2Write.tm.tm_year = year;
+                    data2Write.msg = SERIAL_MSG_DATE;
                 }
                 else
                 {
