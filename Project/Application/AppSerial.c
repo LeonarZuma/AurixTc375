@@ -70,6 +70,7 @@ void AppSerial_periodicTask( void )
     /* create a queue message container */
     App_Pdu data2Read;
     /* while the queue is not empty, read and execute all message in queue */
+    /* Todo: implement a secondary escape method from the while to avoid the risk of being stuck in a infinite loop */
     while (AppQueue_readDataIsr(&can2ssm_queue, &data2Read) == TRUE)
     {
         Serial_State_Machine(&data2Read);
@@ -88,6 +89,7 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 
     data2Write.pci = Rx_Message.messageId;
 
+    /* The function extracts the payload and the id from the receive message. Putting the information inside a queue message to send */
     Serial_singleFrameRx( &data2Write.sdu, &data2Write.pci);
     
     /*!< set a breakpoint after the function  and see the message received using the debugger */
