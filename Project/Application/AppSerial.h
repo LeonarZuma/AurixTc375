@@ -8,19 +8,19 @@
 /*----------------------------------------------------------------------------*/
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
-#define TX_MSG_NO               (3U)
+#define TX_MSG_NO               (2U)
 #define MSG_PDU_BYTES           (8U)
 #define ISR_PRIORITY_CAN_RX     (1)
 
 /** 
   * @defgroup <Time Bouds> Time count boundaries
   @{ */
-#define APPSERIAL_MAX_SEC           (60U)       /*!< MAX seconds count */
-#define APPSERIAL_MAX_MIN           (60U)       /*!< MAX minutes count */
-#define APPSERIAL_MAX_HRS           (24U)       /*!< MAX hours count */
-#define APPSERIAL_MAX_MOS           (12U)       /*!< MAX months count */
-#define APPSERIAL_MAX_YEAR          (2100U)     /*!< MAX years count */
-#define APPSERIAL_MIN_YEAR          (1900U)     /*!< MIN years count */
+#define APPSERIAL_MAX_SEC           (60)       /*!< MAX seconds count */
+#define APPSERIAL_MAX_MIN           (60)       /*!< MAX minutes count */
+#define APPSERIAL_MAX_HRS           (24)       /*!< MAX hours count */
+#define APPSERIAL_MAX_MOS           (12)       /*!< MAX months count */
+#define APPSERIAL_MAX_YEAR          (2100)     /*!< MAX years count */
+#define APPSERIAL_MIN_YEAR          (1900)     /*!< MIN years count */
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */

@@ -35,6 +35,9 @@ IFX_CONST IfxCan_Can_Pins Can_Pins =
 AppQue_Queue can2ssm_queue;
 AppQue_Queue ssm2rtcc_queue;
 
+App_Pdu buffer_can2ssm[QUEUE_BUFFER_SIZE];
+App_Message buffer_ssm2rtcc[QUEUE_BUFFER_SIZE];
+
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
@@ -76,6 +79,7 @@ void AppSerial_periodicTask( void )
 {
     
     Serial_State_Machine();
+    
 }
 
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
@@ -249,7 +253,7 @@ static void CAN_Init(void)
         IfxCan_Can_initMessage( &Tx_Message[index] );
         
         /*Configure the can frame to send*/
-        Tx_Message[index].messageId        = 0x001 + index;                            /*ID*/            
+        Tx_Message[index].messageId        = 0x201 + (index * 11);                            /*ID*/            
         Tx_Message[index].messageIdLength  = IfxCan_MessageIdLength_standard;  /*11 bit ID message*/
         Tx_Message[index].dataLengthCode   = IfxCan_DataLengthCode_8;          /*8 byes to send*/
         Tx_Message[index].frameMode        = IfxCan_FrameMode_fdLong;           /*classic frame*/
@@ -275,9 +279,9 @@ static void CAN_Init(void)
 
 static void Queue_CAN2SSM_Init(void)
 {
-    App_Pdu buffer[QUEUE_BUFFER_SIZE];
+    
     /* Set the buffer for the Queue */
-    can2ssm_queue.buffer = (void*)buffer;
+    can2ssm_queue.buffer = (void*)buffer_can2ssm;
     /* Queue lenght must be the same or less than the buffer size */
     can2ssm_queue.elements = QUEUE_BUFFER_SIZE;
     /* The size of a single element */
@@ -289,9 +293,9 @@ static void Queue_CAN2SSM_Init(void)
 
 static void Queue_SSM2RTCC_Init(void)
 {
-    App_Message buffer[QUEUE_BUFFER_SIZE];
+    
     /* Set the buffer for the Queue */
-    ssm2rtcc_queue.buffer = (void*)buffer;
+    ssm2rtcc_queue.buffer = (void*)buffer_ssm2rtcc;
     /* Queue lenght must be the same or less than the buffer size */
     ssm2rtcc_queue.elements = QUEUE_BUFFER_SIZE;
     /* The size of a single element */
@@ -446,7 +450,8 @@ static void Serial_State_Machine(void)
                 current_state = IDLE;
                 
                 /* Send the message from SSM To RTCC queue */
-                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, 10);
+                // AppQueue_writeDataIsr(&ssm2rtcc_queue, &data2Write);
                 
                 /* Packing bytes to send via CAN*/
                 can_datatx[0] = 0x55;
