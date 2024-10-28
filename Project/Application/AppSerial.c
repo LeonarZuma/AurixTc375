@@ -31,8 +31,9 @@ IFX_CONST IfxCan_Can_Pins Can_Pins =
     .padDriver  = IfxPort_PadDriver_cmosAutomotiveSpeed4
 };
 
-
+/* Queue creation for inter component comunication */
 AppQue_Queue can2ssm_queue;
+App_Message ssm2rtcc_queue;
 
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
@@ -53,6 +54,8 @@ static void CAN_Init(void);
 
 static void Queue_CAN2SSM_Init(void);
 
+static void Queue_SSM2RTCC_Init(void);
+
 static uint16_t YearPdu_ToAppMessage(uint8_t* year);
 
 static void Serial_State_Machine(void);
@@ -66,6 +69,7 @@ void AppSerial_initTask( void )
 {
     CAN_Init();
     Queue_CAN2SSM_Init();
+    Queue_SSM2RTCC_Init();
 }
 
 void AppSerial_periodicTask( void )
@@ -256,6 +260,20 @@ static void Queue_CAN2SSM_Init(void)
 
     /* Init queue Function call */
     AppQueue_initQueue(&can2ssm_queue);
+}
+
+static void Queue_SSM2RTCC_Init(void)
+{
+    App_Message buffer[QUEUE_BUFFER_SIZE];
+    /* Set the buffer for the Queue */
+    ssm2rtcc_queue.buffer = (void*)buffer;
+    /* Queue lenght must be the same or less than the buffer size */
+    ssm2rtcc_queue.elements = QUEUE_BUFFER_SIZE;
+    /* The size of a single element */
+    ssm2rtcc_queue.size = sizeof(App_Message);
+
+    /* Init queue Function call */
+    AppQueue_initQueue(&ssm2rtcc_queue);
 }
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year)
