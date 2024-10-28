@@ -410,6 +410,8 @@ static void Serial_State_Machine(void)
 
                 /* We go back to the first state after the machine logic has been complete */
                 current_state = IDLE;
+                /* Send the message from SSM To RTCC queue */
+                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
                 break;
 
             default:
