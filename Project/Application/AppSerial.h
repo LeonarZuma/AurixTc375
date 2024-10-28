@@ -12,7 +12,6 @@
 #define MSG_PDU_BYTES           (8U)
 #define ISR_PRIORITY_CAN_RX     (1)
 #define QUEUE_BUFFER_SIZE       (8U)
-//#define HEX_1900_TO_DEC         (DEC)
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
@@ -47,6 +46,12 @@ typedef enum
     YR1,
     YR0
 } DateYear_Payload;
+
+typedef enum
+{
+  CAN_SING_FRAME_INVALID = 0,
+  CAN_SING_FRAME_VALID  
+} CanFrame_Validation;
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
 /*----------------------------------------------------------------------------*/
