@@ -105,7 +105,25 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 /*----------------------------------------------------------------------------*/
 static void Serial_singleFrameTx( uint8_t *data, uint8_t size )
 {
+    const uint8_t can_frame_size = 8;
+    uint8_t local_data[can_frame_size];
     
+    /* move to shift one position right the array elements */
+    arrayCopy(data, local_data,can_frame_size, 1);
+    arrayCopy(local_data, data, can_frame_size, 0);
+
+    /* Insert the first data element */
+    /* Set the MSN will always be zero */
+    /* Set the LSN to the number of */
+    if (size > 7)
+    {
+        size = 7;
+    }
+    else
+    {
+        /* Do nothing */
+    }
+    *data = size & (~0xFFF8);
 }
     
 static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
