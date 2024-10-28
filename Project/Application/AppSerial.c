@@ -241,7 +241,25 @@ static void Serial_State_Machine(void)
                 {
                     /* the state reamains as IDLE and we reach the end of loop */
                 }
+
+                break;
             case MESSAGE:
+                /* Check if the receive message is valid */
+                switch (data2Read.pci)
+                {
+                    case 0x111:
+                        current_state = TIME;
+                        break;
+                    case 0x112:
+                        current_state = TIME;
+                        break;
+                    case 0x113:
+                        current_state = TIME;
+                        break;
+                    default:
+                        current_state = ERROR;
+                        break;
+                }
 
             case TIME:
 
