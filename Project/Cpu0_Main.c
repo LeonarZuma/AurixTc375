@@ -42,7 +42,6 @@
 #define N_TIMERS            (3U)
 #define TICK_VAL            (5U)            /* Tick Val 5ms */
 #define TASK1_VAL           (2U)            /* 5 times TickVal */
-#define QUEUE_BUFFER_SIZE   (18U)
 
 /*STM0 module*/
 #define STM0                     0
