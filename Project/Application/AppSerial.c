@@ -213,7 +213,7 @@ static void Queue_CAN2SSM_Init(void)
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year)
 {
-    return ((year[0]) | (year[1])<<8);
+    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) + ((year[1] & 0x0F) * 1);
 }
 
 static void Serial_State_Machine(void)
@@ -298,7 +298,7 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case DATE:
-                year = YearPdu_ToAppMessage(data2Read.sdu[YR0]);
+                year = YearPdu_ToAppMessage(&data2Read.sdu[YR1]);
                 /* check if the receive date is a valid one */
                 valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
                 valid_year  = Serial_validateLeapYear(year);
