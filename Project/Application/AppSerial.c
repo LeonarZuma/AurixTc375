@@ -219,6 +219,10 @@ static void Serial_State_Machine(App_Pdu *data)
 {
     /* define the init SSM state */
     SSM_States current_state = IDLE;
+
+    /* to check the queue current state */
+    uint8_t message_in_queue = FALSE;
+
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
     
     /* if data in queue, keep reading until queue buffer is empty */
@@ -229,7 +233,16 @@ static void Serial_State_Machine(App_Pdu *data)
         switch (current_state)
         {
             case IDLE:
-
+                message_in_queue = AppQueue_isQueueEmpty(&can2ssm_queue);
+                if( message_in_queue == FALSE)
+                {
+                    current_state = MESSAGE;
+                    /* check the queue if there is a message already available */
+                }
+                else
+                {
+                    /* the state reamains as IDLE and we reach the end of loop */
+                }
             case MESSAGE:
 
             case TIME:
@@ -247,5 +260,6 @@ static void Serial_State_Machine(App_Pdu *data)
             default:
                 break;
         }
-    }while(current_state == IDLE);
+        /* this while loop check two things if there are already available messages and if so complete the whole loop (IDLE->MESSAGE->)*/
+    }while((message_in_queue == FALSE) && (current_state != IDLE));
 }
