@@ -52,7 +52,7 @@ static void CAN_Init(void);
 
 static void Queue_CAN2SSM_Init(void);
 
-static void Serial_State_Machine(App_Pdu *data);
+static void Serial_State_Machine(void);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -68,7 +68,7 @@ void AppSerial_initTask( void )
 void AppSerial_periodicTask( void )
 {
     
-    Serial_State_Machine(&data2Read);
+    Serial_State_Machine();
 }
 
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
@@ -266,12 +266,12 @@ static void Serial_State_Machine(void)
                 break;
             case TIME:
                 /* check if the receive time in payload is valid */
-                if (Serial_validateTime(data2Read.sdu[0],data2Read.sdu[1],data2Read.sdu[2]) == TRUE)
+                if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]) == TRUE)
                 {
                     /* Build the message to queue for the RTCC of type TIME */
-                    data2Write.tm.tm_hour = data2Read.sdu[0];
-                    data2Write.tm.tm_min = data2Read.sdu[1];
-                    data2Write.tm.tm_sec = data2Read.sdu[2];
+                    data2Write.tm.tm_hour = data2Read.sdu[HR];
+                    data2Write.tm.tm_min = data2Read.sdu[MIN];
+                    data2Write.tm.tm_sec = data2Read.sdu[SEC];
                     data2Write.msg = SERIAL_MSG_TIME;
 
                     /* Change state to OK */
