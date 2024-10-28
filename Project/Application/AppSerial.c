@@ -33,7 +33,7 @@ IFX_CONST IfxCan_Can_Pins Can_Pins =
 
 /* Queue creation for inter component comunication */
 AppQue_Queue can2ssm_queue;
-App_Message ssm2rtcc_queue;
+AppQue_Queue ssm2rtcc_queue;
 
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
