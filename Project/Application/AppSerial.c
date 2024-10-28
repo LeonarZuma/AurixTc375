@@ -128,8 +128,17 @@ static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
 
 static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t seconds )
 {
-    uint8_t local_validation = 0;
-    return local_validation;
+    uint8_t setTime = FALSE;
+    /* Validate if the time is acceptable */
+    if ((0 <= hour && hour >= 24) && (0 <= minutes && minutes >= 60) && (0 <= seconds && seconds >= 60))
+    {
+        setTime = TRUE;
+    }
+    else
+    {
+        /* Do nothing, no valid data time */
+    }
+    return setTime;
 }
 
 static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
