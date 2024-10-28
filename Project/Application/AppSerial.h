@@ -11,7 +11,6 @@
 #define TX_MSG_NO               (3U)
 #define MSG_PDU_BYTES           (8U)
 #define ISR_PRIORITY_CAN_RX     (1)
-#define QUEUE_BUFFER_SIZE       (8U)
 
 /** 
   * @defgroup <Time Bouds> Time count boundaries
@@ -58,11 +57,6 @@ typedef enum
     YR0
 } DateYear_Payload;
 
-typedef enum
-{
-  CAN_SING_FRAME_INVALID = 0,
-  CAN_SING_FRAME_VALID  
-} CanFrame_Validation;
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
 /*----------------------------------------------------------------------------*/
