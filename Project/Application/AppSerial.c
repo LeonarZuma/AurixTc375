@@ -147,7 +147,8 @@ static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
     uint8_t days_by_month[12] = {31, (28 + ((year % 4) == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
     if((1 <= days && days >= days_by_month[month]) &&
-     (1 <= month && month >= 12) && (1900 <= year && year >= 2100))
+     (1 <= month && month >= APPSERIAL_MAX_MOS) && 
+     (APPSERIAL_MIN_YEAR <= year && year >= APPSERIAL_MAX_YEAR))
     {
         local_validation = TRUE;
     }
