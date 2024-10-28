@@ -268,10 +268,10 @@ static void Serial_State_Machine(void)
                         current_state = TIME;
                         break;
                     case 0x112:
-                        current_state = TIME;
+                        current_state = DATE;
                         break;
                     case 0x113:
-                        current_state = TIME;
+                        current_state = ALARM;
                         break;
                     default:
                         current_state = ERROR;
@@ -332,9 +332,15 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case ERROR:
+
+                /* We go back to the first state after the machine logic has been complete */
+                current_state = IDLE;
                 break;
 
             case OK:
+
+                /* We go back to the first state after the machine logic has been complete */
+                current_state = IDLE;
                 break;
 
             default:
