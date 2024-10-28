@@ -223,6 +223,10 @@ static void Serial_State_Machine(void)
     /* to check the queue current state */
     uint8_t message_in_queue = FALSE;
 
+    /* to chekc if the receive date is a valid one */
+    uint8_t valid_date = 0;
+    uint8_t valid_year = 0;
+
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
     
     /* if data in queue, keep reading until queue buffer is empty */
@@ -284,7 +288,20 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case DATE:
-
+                /* check if the receive date is a valid one */
+                valid_date = Serial_validateDate();
+                valid_year  = Serial_validateLeapYear();
+                if (valid_date == TRUE)
+                {
+                    /* Change state to OK */
+                    current_state = OK;
+                }
+                else
+                {
+                    /* no valid time, change to ERROR state */
+                    current_state = ERROR;
+                }
+                break;
             case ALARM:
                 /* check if the alarm set time is a valid value */
                 if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0) == TRUE)
