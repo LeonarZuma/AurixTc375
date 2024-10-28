@@ -451,7 +451,6 @@ static void Serial_State_Machine(void)
                 
                 /* Send the message from SSM To RTCC queue */
                 AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, 10);
-                // AppQueue_writeDataIsr(&ssm2rtcc_queue, &data2Write);
                 
                 /* Packing bytes to send via CAN*/
                 can_datatx[0] = 0x55;
