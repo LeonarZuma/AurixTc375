@@ -81,6 +81,8 @@ void AppSerial_periodicTask( void )
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 {
     App_Pdu data2Write;
+    /* local size container to take the number of receive bytes */
+    uint8_t size = 0;
 
     /*!< Clear the "Rx FIFO New message" interrupt flag */
     IfxCan_Node_clearInterruptFlag(Can_Node.node, IfxCan_Interrupt_rxFifo0NewMessage);
@@ -91,7 +93,7 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
     data2Write.pci = Rx_Message.messageId;
 
     /* The function extracts the payload and the id from the receive message. Putting the information inside a queue message to send */
-    Serial_singleFrameRx( &data2Write.sdu, &data2Write.pci);
+    Serial_singleFrameRx( &data2Write.sdu, &size);
     
     /*!< set a breakpoint after the function  and see the message received using the debugger */
     messageFlag = 1u;
