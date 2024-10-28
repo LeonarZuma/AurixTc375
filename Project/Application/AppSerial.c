@@ -52,7 +52,7 @@ static void CAN_Init(void);
 
 static void Queue_CAN2SSM_Init(void);
 
-static void Serial_State_Machine(void);
+static void Serial_State_Machine(App_Pdu *data);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -72,7 +72,7 @@ void AppSerial_periodicTask( void )
     /* while the queue is not empty, read and execute all message in queue */
     while (AppQueue_readDataIsr(&can2ssm_queue, &data2Read) == TRUE)
     {
-        Serial_State_Machine();
+        Serial_State_Machine(&data2Read);
     }
 }
 
@@ -154,9 +154,9 @@ static void CAN_Init(void)
     Can_Node_Config.frame.type        = IfxCan_FrameType_transmitAndReceive;//define the frame to be the transmitting one
     
     Can_Node_Config.interruptConfig.rxFifo0NewMessageEnabled                = TRUE;                         /*!< Once the message is stored in the FIFO RX buffer, raise the interrupt */
-    Can_Node_Config.interruptConfig.rxf0f.priority                          = ISR_PRIORITY_CAN_RX;           //define the transmission complete interrupt priority
-    Can_Node_Config.interruptConfig.rxf0f.interruptLine                     = IfxCan_InterruptLine_1;   //assign the interrupt line 1 to the receive interrupt
-    Can_Node_Config.interruptConfig.rxf0f.typeOfService                     = IfxSrc_Tos_cpu0;          //receive interrupt service routine should be serviced by the CPU0
+    Can_Node_Config.interruptConfig.rxf0n.priority                          = ISR_PRIORITY_CAN_RX;           //define the transmission complete interrupt priority
+    Can_Node_Config.interruptConfig.rxf0n.interruptLine                     = IfxCan_InterruptLine_1;   //assign the interrupt line 1 to the receive interrupt
+    Can_Node_Config.interruptConfig.rxf0n.typeOfService                     = IfxSrc_Tos_cpu0;          //receive interrupt service routine should be serviced by the CPU0
 
     Can_Node_Config.rxConfig.rxMode                                         = IfxCan_RxMode_fifo0;          /*!< Setting the Rx mode as FIFO 1  */
     Can_Node_Config.rxConfig.rxFifo0DataFieldSize                           = IfxCan_DataFieldSize_8;       /*!< Datafield 8 */
@@ -213,7 +213,7 @@ static void Queue_CAN2SSM_Init(void)
     AppQueue_initQueue(&can2ssm_queue);
 }
 
-static void Serial_State_Machine(void)
+static void Serial_State_Machine(App_Pdu *data)
 {
     /* define the init SSM state */
     SSM_States current_state = IDLE;
