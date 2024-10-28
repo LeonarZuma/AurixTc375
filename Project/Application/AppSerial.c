@@ -154,9 +154,9 @@ static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t secon
 {
     uint8_t setTime = FALSE;
     /* Validate if the time is acceptable */
-    if ((0 <= hour && hour >= APPSERIAL_MAX_HRS) && 
-    (0 <= minutes && minutes >= APPSERIAL_MAX_MIN) && 
-    (0 <= seconds && seconds >= APPSERIAL_MAX_SEC))
+    if ((0 <= hour && hour <= APPSERIAL_MAX_HRS) && 
+    (0 <= minutes && minutes <= APPSERIAL_MAX_MIN) && 
+    (0 <= seconds && seconds <= APPSERIAL_MAX_SEC))
     {
         setTime = TRUE;
     }
@@ -172,9 +172,9 @@ static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
     uint8_t local_validation = FALSE;
     uint8_t days_by_month[12] = {31, (28 + ((year % 4) == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
-    if((1 <= days && days >= days_by_month[month]) &&
-     (1 <= month && month >= APPSERIAL_MAX_MOS) && 
-     (APPSERIAL_MIN_YEAR <= year && year >= APPSERIAL_MAX_YEAR))
+    if((1 <= days && days <= days_by_month[month]) &&
+     (1 <= month && month <= APPSERIAL_MAX_MOS) && 
+     (APPSERIAL_MIN_YEAR <= year && year <= APPSERIAL_MAX_YEAR))
     {
         local_validation = TRUE;
     }
