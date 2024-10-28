@@ -169,8 +169,15 @@ static uint8_t Serial_validateLeapYear( uint32_t year )
 
 static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year )
 {
-    uint8_t local_validation = 0;
-    return local_validation;
+    uint16_t constVal = year;
+    uint8_t weekday = 0;
+    uint8_t lutTable[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+
+    /* This numbers can be consider magic numbers, because they dont have an specific */
+    constVal -= (month < 3);
+    weekday = ((constVal + (constVal / 4) - (constVal / 100) + (constVal / 400) + lutTable[month - 1] + days) % 7);
+    
+    return weekday;
 }
 
 static void CAN_Init(void)
@@ -253,8 +260,7 @@ static void Queue_CAN2SSM_Init(void)
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year)
 {
-    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) +
-    ((year[1] & 0x0F) * 1);
+    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) + (year[1] & 0x0F);
 }
 
 static void Serial_State_Machine(void)
