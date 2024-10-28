@@ -324,6 +324,9 @@ static void Serial_State_Machine(void)
     /* to chekc if the receive date is a valid one */
     uint8_t valid_date = 0;
 
+    /* Can data transmission */
+    uint8_t can_datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
     /* create a queue message container for the Tx queue that is sharing the message time configurationn */
     
     /* if data in queue, keep reading until queue buffer is empty */
@@ -427,14 +430,29 @@ static void Serial_State_Machine(void)
 
                 /* We go back to the first state after the machine logic has been complete */
                 current_state = IDLE;
+                /* Packing bytes to send via CAN*/
+                can_datatx[0] = 0xAA;
+                Serial_singleFrameTx( &can_datatx, 1);
+
+                /* Send NOK message via CAN */
+                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );
+
                 break;
 
             case OK:
-
                 /* We go back to the first state after the machine logic has been complete */
                 current_state = IDLE;
+                
                 /* Send the message from SSM To RTCC queue */
                 AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+                
+                /* Packing bytes to send via CAN*/
+                can_datatx[0] = 0x55;
+                Serial_singleFrameTx( &can_datatx, 1);
+
+                /* Send OK message via CAN */
+                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );
+
                 break;
 
             default:
