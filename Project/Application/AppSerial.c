@@ -282,10 +282,27 @@ static void Serial_State_Machine(void)
                     /* no valid time, change to ERROR state */
                     current_state = ERROR;
                 }
+                break;
             case DATE:
 
             case ALARM:
+                /* check if the alarm set time is a valid value */
+                if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0) == TRUE)
+                {
+                    /* Build the message to queue for the RTCC of type ALARM */
+                    data2Write.tm.tm_hour = data2Read.sdu[HR];
+                    data2Write.tm.tm_min = data2Read.sdu[MIN];
+                    data2Write.msg = SERIAL_MSG_ALARM;
 
+                    /* Change state to OK */
+                    current_state = OK;
+                }
+                else
+                {
+                    /* no valid time, change to ERROR state */
+                    current_state = ERROR;
+                }
+                break;
             case ERROR:
                 break;
 
