@@ -67,14 +67,8 @@ void AppSerial_initTask( void )
 
 void AppSerial_periodicTask( void )
 {
-    /* create a queue message container */
-    App_Pdu data2Read;
-    /* while the queue is not empty, read and execute all message in queue */
-    /* Todo: implement a secondary escape method from the while to avoid the risk of being stuck in a infinite loop */
-    while (AppQueue_readDataIsr(&can2ssm_queue, &data2Read) == TRUE)
-    {
-        Serial_State_Machine(&data2Read);
-    }
+    
+    Serial_State_Machine(&data2Read);
 }
 
 IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
@@ -215,8 +209,11 @@ static void Queue_CAN2SSM_Init(void)
     AppQueue_initQueue(&can2ssm_queue);
 }
 
-static void Serial_State_Machine(App_Pdu *data)
+static void Serial_State_Machine(void)
 {
+    /* create a queue message container */
+    App_Pdu data2Read;
+
     /* define the init SSM state */
     SSM_States current_state = IDLE;
 
@@ -233,11 +230,12 @@ static void Serial_State_Machine(App_Pdu *data)
         switch (current_state)
         {
             case IDLE:
+                /* check the queue if there is a message already available */
                 message_in_queue = AppQueue_isQueueEmpty(&can2ssm_queue);
                 if( message_in_queue == FALSE)
                 {
                     current_state = MESSAGE;
-                    /* check the queue if there is a message already available */
+                    AppQueue_readDataIsr(&can2ssm_queue, &data2Read);
                 }
                 else
                 {
