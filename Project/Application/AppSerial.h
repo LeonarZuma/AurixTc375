@@ -12,6 +12,7 @@
 #define MSG_PDU_BYTES           (8U)
 #define ISR_PRIORITY_CAN_RX     (1)
 #define QUEUE_BUFFER_SIZE       (8U)
+//#define HEX_1900_TO_DEC         (DEC)
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
