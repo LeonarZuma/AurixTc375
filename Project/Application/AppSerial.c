@@ -143,14 +143,25 @@ static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t secon
 
 static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
 {
-    uint8_t local_validation = 0;
+    uint8_t local_validation = FALSE;
+    uint8_t days_by_month[12] = {31, (28 + ((year % 4) == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    
+    if((1 <= days && days >= days_by_month[month]) &&
+     (1 <= month && month >= 12) && (1900 <= year && year >= 2100))
+    {
+        local_validation = TRUE;
+    }
+    else
+    {
+        /* do nothing, keep the default value for local validation */
+    }
     return local_validation;
 }
 
 static uint8_t Serial_validateLeapYear( uint32_t year )
 {
-    uint8_t local_validation = 0;
-    return local_validation;
+    /* check if the receive year is a leap year TRUE (1)*/
+    return ((year % 4) == 0);
 }
 
 static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year )
