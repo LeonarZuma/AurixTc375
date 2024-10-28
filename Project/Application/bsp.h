@@ -14,7 +14,7 @@
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
 #define MUTEX_uS_WAIT       (100U)      /*!<uS Mutex wait time>*/
-#define QUEUE_BUFFER_SIZE   (18U)
+#define QUEUE_BUFFER_SIZE   (8U)
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
