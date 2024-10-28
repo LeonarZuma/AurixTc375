@@ -211,6 +211,9 @@ static void Queue_CAN2SSM_Init(void)
 
 static void Serial_State_Machine(void)
 {
+    /* create a queue message container to write for the rtcc queue */
+    App_Message data2Write;
+
     /* create a queue message container */
     App_Pdu data2Read;
 
@@ -266,7 +269,11 @@ static void Serial_State_Machine(void)
                 if (Serial_validateTime(data2Read.sdu[0],data2Read.sdu[1],data2Read.sdu[2]) == TRUE)
                 {
                     /* Build the message to queue for the RTCC of type TIME */
-                    
+                    data2Write.tm.tm_hour = data2Read.sdu[0];
+                    data2Write.tm.tm_min = data2Read.sdu[1];
+                    data2Write.tm.tm_sec = data2Read.sdu[2];
+                    data2Write.msg = SERIAL_MSG_TIME;
+
                     /* Change state to OK */
                     current_state = OK;
                 }
