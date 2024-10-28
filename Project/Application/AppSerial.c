@@ -260,9 +260,21 @@ static void Serial_State_Machine(void)
                         current_state = ERROR;
                         break;
                 }
-
+                break;
             case TIME:
-
+                /* check if the receive time in payload is valid */
+                if (Serial_validateTime(data2Read.sdu[0],data2Read.sdu[1],data2Read.sdu[2]) == TRUE)
+                {
+                    /* Build the message to queue for the RTCC of type TIME */
+                    
+                    /* Change state to OK */
+                    current_state = OK;
+                }
+                else
+                {
+                    /* no valid time, change to ERROR state */
+                    current_state = ERROR;
+                }
             case DATE:
 
             case ALARM:
