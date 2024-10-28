@@ -3,6 +3,7 @@
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
 #include "AppSerial.h"
+
 #include "bsp.h"
 
 /*----------------------------------------------------------------------------*/
@@ -105,7 +106,23 @@ static void Serial_singleFrameTx( uint8_t *data, uint8_t size )
     
 static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
 {
-    uint8_t local_validation = 0;
+    const uint8_t can_frame_size = 8;
+    uint8_t local_data[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    uint8_t local_validation = CAN_SING_FRAME_INVALID;
+    /* We are taking out the value of size from the CAN frame */
+    *size = *data;
+    if(*data <= 0x07)
+    {
+        *data = 0;
+        local_validation = CAN_SING_FRAME_VALID;
+        arrayCopy(data, local_data, can_frame_size, -1);
+        arrayCopy(local_data, data, can_frame_size, 0);
+    }
+    else
+    {
+        /* Do nothing */
+    }
     return local_validation;
 }
 
@@ -213,7 +230,8 @@ static void Queue_CAN2SSM_Init(void)
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year)
 {
-    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) + ((year[1] & 0x0F) * 1);
+    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) +
+    ((year[1] & 0x0F) * 1);
 }
 
 static void Serial_State_Machine(void)
