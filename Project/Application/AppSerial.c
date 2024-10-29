@@ -465,5 +465,5 @@ static void Serial_State_Machine(void)
                 break;
         }
         /* this while loop check two things if there are already available messages and if so complete the whole loop (IDLE->MESSAGE->)*/
-    }while((message_in_queue == FALSE) && (current_state != IDLE));
+    }while((message_in_queue == FALSE) || (current_state != IDLE));
 }

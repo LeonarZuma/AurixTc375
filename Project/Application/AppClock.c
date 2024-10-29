@@ -19,6 +19,15 @@
 /*                     Implementation of global functions                     */
 /*----------------------------------------------------------------------------*/
 
+void AppClock_initTask( void )
+{
+
+}
+
+void AppClock_periodicTask( void )
+{
+    
+}
 
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of local functions                  */
