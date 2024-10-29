@@ -441,7 +441,7 @@ static void Serial_State_Machine(void)
                 Serial_singleFrameTx( &can_datatx, 1);
 
                 /* Send NOK message via CAN */
-                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );
+                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message[1], (uint32*)&can_datatx[ 0u ] );
 
                 break;
 
