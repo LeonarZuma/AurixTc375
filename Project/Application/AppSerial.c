@@ -253,7 +253,7 @@ static void CAN_Init(void)
         IfxCan_Can_initMessage( &Tx_Message[index] );
         
         /*Configure the can frame to send*/
-        Tx_Message[index].messageId        = 0x201 + (index * 11);                            /*ID*/            
+        Tx_Message[index].messageId        = 0x201 + (index * 0x11);                            /*ID*/            
         Tx_Message[index].messageIdLength  = IfxCan_MessageIdLength_standard;  /*11 bit ID message*/
         Tx_Message[index].dataLengthCode   = IfxCan_DataLengthCode_8;          /*8 byes to send*/
         Tx_Message[index].frameMode        = IfxCan_FrameMode_fdLong;           /*classic frame*/
