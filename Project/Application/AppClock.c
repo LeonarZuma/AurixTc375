@@ -95,29 +95,51 @@ static void Clock_State_Machine(void)
                     /* Read message from queue */
                     AppQueue_readDataIsr(&ssm2rtcc_queue, &data2Read);
                     /* Assign the current receive message type to change CSM current state */
-                    current_state = data2Read.msg;
+                    current_state = MESSAGE;
                 }
                 else
                 {
                     /* do nothing */
                 }
                 break;
+            case MESSAGE:
+                /* perform message filtering */
+                switch(data2Read.msg)
+                {
+                    case SERIAL_MSG_TIME:
+                        current_state = CNFG_TIME;
+                        break;
+                    case SERIAL_MSG_DATE:
+                        current_state = CNFG_DATE;
+                        break;
+                    case SERIAL_MSG_ALARM:
+                        current_state = CNFG_ALARM;
+                        break;
+                    default:
+                        current_state = IDLE;
+                        break;
+                }
+                break;
             case CNFG_TIME:
                 AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec);
-                current_state = SERIAL_MSG_NONE;
+                current_state = IDLE;
                 break;
             case CNFG_DATE:
                 AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year);
-                current_state = SERIAL_MSG_NONE;
+                current_state = IDLE;
                 break;
             case CNFG_ALARM:
                 AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min);
-                current_state = SERIAL_MSG_NONE;
+                current_state = IDLE;
+                break;
+            case SENT_TIME:
+                break;
+            case SENT_DATE:
                 break;
             default:
                 break;
         }
-    } while (current_state != SERIAL_MSG_NONE);
+    } while (current_state != IDLE);
     
     
 }
