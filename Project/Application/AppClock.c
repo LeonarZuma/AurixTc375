@@ -140,6 +140,4 @@ static void Clock_State_Machine(void)
                 break;
         }
     } while (current_state != IDLE);
-    
-    
 }
