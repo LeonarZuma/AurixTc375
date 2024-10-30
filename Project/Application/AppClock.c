@@ -71,22 +71,53 @@ void AppClock_periodicTask( void )
     set_alarmString(al_string, al_hour, al_min);
 }
 
+
+
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of local functions                  */
 /*----------------------------------------------------------------------------*/
 
 static void Clock_State_Machine(void)
 {
+    /* create a queue message container to write for the rtcc queue */
+    App_Message data2Read;
+    
+    /* define the init CSM state */
     App_Messages message_receive = SERIAL_MSG_NONE;
-    switch (message_receive)
+
+    do
     {
-        case SERIAL_MSG_TIME:
-        break;
-        case SERIAL_MSG_DATE:
-        break;
-        case SERIAL_MSG_ALARM:
-        break;
-        default:
-        break;
-    }
+        switch (message_receive)
+        {
+            case SERIAL_MSG_NONE:
+                if(AppQueue_isQueueEmpty(&ssm2rtcc_queue) == TRUE)
+                {
+                    /* Read message from queue */
+                    AppQueue_readDataIsr(&ssm2rtcc_queue, &data2Read);
+                    /* Assign the current receive message type to change CSM current state */
+                    message_receive = data2Read.msg;
+                }
+                else
+                {
+                    /* do nothing */
+                }
+                break;
+            case SERIAL_MSG_TIME:
+                AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec);
+                message_receive = SERIAL_MSG_NONE;
+                break;
+            case SERIAL_MSG_DATE:
+                AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year);
+                message_receive = SERIAL_MSG_NONE;
+                break;
+            case SERIAL_MSG_ALARM:
+                AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min);
+                message_receive = SERIAL_MSG_NONE;
+                break;
+            default:
+                break;
+        }
+    } while (message_receive != SERIAL_MSG_NONE);
+    
+    
 }
