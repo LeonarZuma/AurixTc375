@@ -83,41 +83,41 @@ static void Clock_State_Machine(void)
     App_Message data2Read;
     
     /* define the init CSM state */
-    App_Messages message_receive = SERIAL_MSG_NONE;
+    CSM_states current_state = SERIAL_MSG_NONE;
 
     do
     {
-        switch (message_receive)
+        switch (current_state)
         {
-            case SERIAL_MSG_NONE:
+            case IDLE:
                 if(AppQueue_isQueueEmpty(&ssm2rtcc_queue) == TRUE)
                 {
                     /* Read message from queue */
                     AppQueue_readDataIsr(&ssm2rtcc_queue, &data2Read);
                     /* Assign the current receive message type to change CSM current state */
-                    message_receive = data2Read.msg;
+                    current_state = data2Read.msg;
                 }
                 else
                 {
                     /* do nothing */
                 }
                 break;
-            case SERIAL_MSG_TIME:
+            case CNFG_TIME:
                 AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec);
-                message_receive = SERIAL_MSG_NONE;
+                current_state = SERIAL_MSG_NONE;
                 break;
-            case SERIAL_MSG_DATE:
+            case CNFG_DATE:
                 AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year);
-                message_receive = SERIAL_MSG_NONE;
+                current_state = SERIAL_MSG_NONE;
                 break;
-            case SERIAL_MSG_ALARM:
+            case CNFG_ALARM:
                 AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min);
-                message_receive = SERIAL_MSG_NONE;
+                current_state = SERIAL_MSG_NONE;
                 break;
             default:
                 break;
         }
-    } while (message_receive != SERIAL_MSG_NONE);
+    } while (current_state != SERIAL_MSG_NONE);
     
     
 }
