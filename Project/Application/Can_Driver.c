@@ -56,8 +56,8 @@ void AppClock_CAN_Init(void)
 
 
     /* Configure Tx buffer for transmision */
-    // Can_Node_Config.txConfig.txMode = IfxCan_TxMode_fifo;
-    // Can_Node_Config.txConfig.txFifoQueueSize = 8;
+    Can_Node_Config.txConfig.txMode = IfxCan_TxMode_fifo;
+    Can_Node_Config.txConfig.txFifoQueueSize = 8;
 
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &Can_Node, &Can_Node_Config );
