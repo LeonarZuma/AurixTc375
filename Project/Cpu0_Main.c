@@ -37,11 +37,13 @@
 
 #include "bsp.h"
 #include "AppSerial.h"
+#include "AppClock.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
 #define TICK_VAL            (5U)            /* Tick Val 5ms */
 #define TASK1_VAL           (2U)            /* 5 times TickVal */
+#define TASK2_VAL           (10U)           /* 10 times TickVal */
 
 /*STM0 module*/
 #define STM0                     0
@@ -69,6 +71,7 @@ void core0_main(void)
     AppQueue_initQueue(&shared_queue);
 
     uint64 Timeout_10ms;
+    uint64 Timeout_50ms;
 
     /* Task ID creation */
     Sche_core0.tick = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, TICK_VAL);
@@ -83,8 +86,10 @@ void core0_main(void)
 
     /*get the number of ticks corresponding to 10ms */
     Timeout_10ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
+    Timeout_50ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
 
     AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_10ms);
+    AppSched_registerTask(&Sche_core0, AppClock_initTask, AppClock_periodicTask, Timeout_50ms);
 
     /* !!WATCHDOG0 AND SAFETY WATCHDOG ARE DISABLED HERE!!
      * Enable the watchdogs and service them periodically if it is required */

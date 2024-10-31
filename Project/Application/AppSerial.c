@@ -16,7 +16,7 @@ IfxCan_Can_Config Can_Config;
 IfxCan_Can_Node Can_Node;
 IfxCan_Can_NodeConfig Can_Node_Config;
 IfxCan_Filter Can_Dst_Filter;
-IfxCan_Message Tx_Message[TX_MSG_NO];
+IfxCan_Message Tx_Message;
 IfxCan_Message Rx_Message;
 uint8 Rx_Data[3u][MSG_PDU_BYTES];
 uint8 messageFlag;
@@ -247,17 +247,15 @@ static void CAN_Init(void)
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &Can_Node, &Can_Node_Config );
 
-    for(uint8_t index = 0; index < TX_MSG_NO; index++)
-    {
-        /* Initialization of the TX message with the default configuration */
-        IfxCan_Can_initMessage( &Tx_Message[index] );
-        
-        /*Configure the can frame to send*/
-        Tx_Message[index].messageId        = 0x201 + (index * 0x11);                            /*ID*/            
-        Tx_Message[index].messageIdLength  = IfxCan_MessageIdLength_standard;  /*11 bit ID message*/
-        Tx_Message[index].dataLengthCode   = IfxCan_DataLengthCode_8;          /*8 byes to send*/
-        Tx_Message[index].frameMode        = IfxCan_FrameMode_fdLong;           /*classic frame*/
-    }
+
+    /* Initialization of the TX message with the default configuration */
+    IfxCan_Can_initMessage( &Tx_Message );
+    
+    /*Configure the can frame to send*/
+    Tx_Message.messageId        = 0x122;                            /*ID*/            
+    Tx_Message.messageIdLength  = IfxCan_MessageIdLength_standard;  /*11 bit ID message*/
+    Tx_Message.dataLengthCode   = IfxCan_DataLengthCode_8;          /*8 byes to send*/
+    Tx_Message.frameMode        = IfxCan_FrameMode_fdLong;           /*classic frame*/
 
     /* Initialization of the TX message with the default configuration */
     IfxCan_Can_initMessage( &Rx_Message );
@@ -441,7 +439,7 @@ static void Serial_State_Machine(void)
                 Serial_singleFrameTx( &can_datatx, 1);
 
                 /* Send NOK message via CAN */
-                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message[1], (uint32*)&can_datatx[ 0u ] );
+                IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );
 
                 break;
 
