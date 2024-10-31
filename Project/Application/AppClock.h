@@ -21,8 +21,8 @@
 /*----------------------------------------------------------------------------*/
 typedef enum
 {
-    IDLE = 0,
-    MESSAGE,
+    CLOCK_IDLE = 0,
+    CLOCK_MESSAGE,
     CNFG_TIME,
     CNFG_DATE,
     CNFG_ALARM,
