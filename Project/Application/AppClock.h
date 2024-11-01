@@ -53,8 +53,10 @@ extern AppQue_Queue ssm2rtcc_queue;
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
-void AppClock_initTask( void );
+void AppClock_initTask(void);
 
-void AppClock_periodicTask( void );
+void AppClock_periodicTask(void);
+
+void AppClock_RTCCUpdate_Callback(void);
 
 #endif
