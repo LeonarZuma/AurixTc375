@@ -19,7 +19,9 @@ static AppRtcc_Rtcc RTCC_struct;
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
 
-static void AppClock_StateMachine(void);
+static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content);
+
+static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -55,7 +57,14 @@ void AppClock_periodicTask( void )
     // AppRtcc_getAlarm(&RTCC_struct, &al_hour, &al_min);
     // set_alarmString(al_string, al_hour, al_min);
 
-    AppClock_StateMachine();
+    /* Create data struct type to contain the queue information */
+    appclock_ssm2rtcc_data_t ssm2rtcc_queue_content = {
+        .size = 0,
+        .state = FALSE
+    };
+
+    AppClock_ReadAllQueue(ssm2rtcc_queue_content);
+    AppClock_StateMachine(ssm2rtcc_queue_content);
 }
 
 void AppClock_RTCCUpdate_Callback()
@@ -68,7 +77,7 @@ void AppClock_RTCCUpdate_Callback()
 /*                         Implementation of local functions                  */
 /*----------------------------------------------------------------------------*/
 
-static void AppClock_StateMachine(void)
+static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
 {
     /* create a queue message container to write for the rtcc queue */
     App_Message data2Read;
@@ -84,10 +93,11 @@ static void AppClock_StateMachine(void)
         switch (current_state)
         {
             case CLOCK_IDLE:
-                if(AppQueue_isQueueEmpty(&ssm2rtcc_queue) == TRUE)
+                if(queue_content.size > 0)
                 {
-                    /* Read message from queue */
-                    AppQueue_readDataIsr(&ssm2rtcc_queue, &data2Read);
+                    queue_content.size --;
+                    /* detach an elemnt from the queue to place process it */
+                    data2Read = queue_content.data[queue_content.size];
                     /* Assign the current receive message type to change CSM current state */
                     current_state = CLOCK_MESSAGE;
                 }
@@ -136,4 +146,14 @@ static void AppClock_StateMachine(void)
                 break;
         }
     } while (current_state != CLOCK_IDLE);
+}
+
+static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content)
+{
+    while (AppQueue_isQueueEmpty(&ssm2rtcc_queue) == FALSE)
+    {
+        queue_content.state &= ~(0b1);  /* Set this variable as TRUE to indicate a reading has been perfomed */     
+        AppQueue_readDataIsr(&ssm2rtcc_queue, &queue_content.data[queue_content.size]);
+        queue_content.size ++;
+    }
 }
