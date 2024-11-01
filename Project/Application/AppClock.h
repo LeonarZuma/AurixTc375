@@ -29,6 +29,13 @@ typedef enum
     SENT_TIME,
     SENT_DATE
 } CSM_states;
+
+typedef struct
+{
+    uint8_t state;              /* TRUE (1) if we have read data */
+    uint8_t size;               /* How many elements has been read */
+    App_Message data[8];        /* Contains the read data from the queue */
+}appclock_ssm2rtcc_data_t;
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
 /*----------------------------------------------------------------------------*/
