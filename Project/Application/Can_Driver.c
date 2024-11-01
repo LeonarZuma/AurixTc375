@@ -75,7 +75,7 @@ void AppClock_CAN_Init(void)
     }
 }
 
-void AppClock_Can_SendTime(uint8_t *data)
+void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data)
 {
-    IfxCan_Can_sendMessage( &Can_Node, &Tx_Message[0], (uint32*)&data[ 0u ] );
+    IfxCan_Can_sendMessage( &Can_Node, &Tx_Message[txmessage_idx], (uint32*)&data[ 0u ] );
 }

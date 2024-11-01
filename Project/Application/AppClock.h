@@ -36,6 +36,13 @@ typedef struct
     uint8_t size;               /* How many elements has been read */
     App_Message data[8];        /* Contains the read data from the queue */
 }appclock_ssm2rtcc_data_t;
+
+
+typedef enum
+{
+    APPCLOCK_DATE = 0,
+    APPCLOCK_TIME = 1
+} APPCLOCK_CAN_MESSAGES;
 /*----------------------------------------------------------------------------*/
 /*                             Global data at RAM                             */
 /*----------------------------------------------------------------------------*/
