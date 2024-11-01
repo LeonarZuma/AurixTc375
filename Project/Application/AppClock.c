@@ -47,15 +47,12 @@ void AppClock_periodicTask( void )
 {
     // /* Create the string to print the current time hour, minutes and seconds*/
     // AppRtcc_getTime(&RTCC_struct, &tm_hr, &tm_min, &tm_sec);
-    // convert_timeToString(tm_string, tm_hr, tm_min, tm_sec);
 
     // /* Create the string to print the current Date Month, Day, Year, Weekday */
     // AppRtcc_getDate(&RTCC_struct, &tm_day, &tm_month, &tm_year, &tm_wday);
-    // set_dateString(dt_string, tm_month, tm_day, tm_year, tm_wday);
 
     // /* Create the string to print the ALARM cnfg. */
     // AppRtcc_getAlarm(&RTCC_struct, &al_hour, &al_min);
-    // set_alarmString(al_string, al_hour, al_min);
 
     /* Create data struct type to contain the queue information */
     appclock_ssm2rtcc_data_t ssm2rtcc_queue_content = {
