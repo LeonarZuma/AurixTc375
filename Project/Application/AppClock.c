@@ -28,18 +28,14 @@ static void Clock_State_Machine(void);
 void AppClock_initTask( void )
 {
     /* Set the the corresponding Node Request for GPSR0 SR0 to service provider CPU0 with a priority of 10 */
-    IfxSrc_init( &MODULE_SRC.GPSR.GPSR[GPSR0].SR[SR0], IfxSrc_Tos_cpu0, IFX_INTPRIO_GPSR0_SR0);
+    /* this is part of the alarm set up */
 
     AppRtcc_clockInit(&RTCC_struct);
     AppRtcc_setDate(&RTCC_struct, 29, 2, 2024);
     AppRtcc_setTime(&RTCC_struct, 23, 59, 00);
     AppRtcc_setAlarm(&RTCC_struct, 00, 00);
 
-    AppRtcc_intAlarmEnable(&RTCC_struct, SR0);
-
-    /*configure the pin */
-    IfxPort_setPinMode( &MODULE_P00, 5, IfxPort_Mode_outputPushPullGeneral );
-    IfxPort_setPinPadDriver( &MODULE_P00, 5, IfxPort_PadDriver_cmosAutomotiveSpeed1 );
+    /* initialize the alarm*/
 
     /* Init Can for CSM */
     AppClock_CAN_Init();
@@ -47,21 +43,6 @@ void AppClock_initTask( void )
 
 void AppClock_periodicTask( void )
 {
-    // int8_t tm_string[9];
-    // uint8_t tm_hr = 0;
-    // uint8_t tm_min = 0;
-    // uint8_t tm_sec = 0;
-
-    // int8_t dt_string[30];
-    // uint8_t tm_day = 0;
-    // uint8_t tm_month = 0;
-    // uint16_t tm_year = 0;
-    // uint8_t tm_wday = 0;
-
-    // int8_t al_string[12];
-    // uint8_t al_hour = 0;
-    // uint8_t al_min = 0;
-
     // /* Create the string to print the current time hour, minutes and seconds*/
     // AppRtcc_getTime(&RTCC_struct, &tm_hr, &tm_min, &tm_sec);
     // convert_timeToString(tm_string, tm_hr, tm_min, tm_sec);
