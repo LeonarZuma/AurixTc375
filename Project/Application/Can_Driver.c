@@ -79,3 +79,11 @@ void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data)
 {
     IfxCan_Can_sendMessage( &Can_Node, &Tx_Message[txmessage_idx], (uint32*)&data[ 0u ] );
 }
+
+uint8_t AppClock_Can_Decimal2BCD (uint8_t data)
+{
+    uint8_t tens = (data / 0xA) * 0x10;
+    uint8_t units = data % 0xA;
+    return (tens + units);
+}
+

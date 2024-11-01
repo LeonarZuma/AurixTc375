@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
-#include "IfxStm.h"
 #include "AppClock.h"
 #include "bsp.h"
 #include "RTCC.h"
@@ -22,6 +21,10 @@ static AppRtcc_Rtcc RTCC_struct;
 static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content);
 
 static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content);
+
+static void AppClock_CanTx_DateTime(App_TmTime data);
+
+static void AppClock_getTimeDate(App_TmTime data);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -45,15 +48,6 @@ void AppClock_initTask( void )
 
 void AppClock_periodicTask( void )
 {
-    // /* Create the string to print the current time hour, minutes and seconds*/
-    // AppRtcc_getTime(&RTCC_struct, &tm_hr, &tm_min, &tm_sec);
-
-    // /* Create the string to print the current Date Month, Day, Year, Weekday */
-    // AppRtcc_getDate(&RTCC_struct, &tm_day, &tm_month, &tm_year, &tm_wday);
-
-    // /* Create the string to print the ALARM cnfg. */
-    // AppRtcc_getAlarm(&RTCC_struct, &al_hour, &al_min);
-
     /* Create data struct type to contain the queue information */
     appclock_ssm2rtcc_data_t ssm2rtcc_queue_content = {
         .size = 0,
@@ -69,9 +63,16 @@ void AppClock_periodicTask( void )
 
 void AppClock_RTCCUpdate_Callback()
 {
+    App_TmTime datetime_data;
+    
     /* update Rtcc time*/
     AppRtcc_periodicTask(&RTCC_struct);
+
+    /* get time and date */
+    AppClock_getTimeDate(datetime_data);
+
     /* send time and data over can bus */
+    AppClock_CanTx_DateTime(datetime_data);
 }
 
 
@@ -151,14 +152,38 @@ static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content)
     }
 }
 
-static void AppClock_Can_DateTime()
+static void AppClock_CanTx_DateTime(App_TmTime data)
 {
     /* Defien the data array */
     uint8_t datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-    /* Send date over CAN */
-    AppClock_Can_SendTime(APPCLOCK_DATE, datatx);
+    datatx[0] = AppClock_Can_Decimal2BCD(data.tm_hour);
+    datatx[1] = AppClock_Can_Decimal2BCD(data.tm_min);
+    datatx[2] = AppClock_Can_Decimal2BCD(data.tm_sec);
+
+    /* Pack message in CAN-TP format */    
+    CanTp_SingleFrameTx(datatx, 3);
 
     /* Send time over CAN */
-    AppClock_Can_SendTime(APPCLOCK_TIME, datatx);
+    AppClock_Can_SendTime(APPCLOCK_TIME, (uint8_t *)&datatx);
+
+    datatx[0] = AppClock_Can_Decimal2BCD(data.tm_wday);
+    datatx[1] = AppClock_Can_Decimal2BCD(data.tm_mon);
+    datatx[2] = AppClock_Can_Decimal2BCD((uint8_t)(data.tm_year & 0xF));
+    datatx[3] = AppClock_Can_Decimal2BCD((uint8_t)(data.tm_year >> 0x4));
+
+    /* Pack message in CAN-TP format */
+    CanTp_SingleFrameTx(datatx, 4);
+
+    /* Send date over CAN */
+    AppClock_Can_SendTime(APPCLOCK_DATE, (uint8_t *)&datatx);
+}
+
+static void AppClock_getTimeDate(App_TmTime data)
+{
+    // /* Create the string to print the current time hour, minutes and seconds*/
+    AppRtcc_getTime(&RTCC_struct, &data.tm_hour, &data.tm_min, &data.tm_sec);
+
+    // /* Create the string to print the current Date Month, Day, Year, Weekday */
+    AppRtcc_getDate(&RTCC_struct, &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_wday);
 }

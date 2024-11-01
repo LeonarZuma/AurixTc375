@@ -263,7 +263,7 @@ static void CAN_Init(void)
     Rx_Message.bufferNumber     = 0u;                               /*!< Buffer number */
     Rx_Message.dataLengthCode   = IfxCan_DataLengthCode_8;          /*!< Data lenght code ofn 8 bits */
     Rx_Message.frameMode        = IfxCan_FrameMode_fdLong;        /*!< Frame mod as standard, we  can change it to FD */
-    Rx_Message.readFromRxFifo0  = TRUE;                             /*!< Read from the FIFO 1 */
+    Rx_Message.readFromRxFifo0  = TRUE;                             /*!< Read from the FIFO 0 */
 
     /*Configure the reception filter to accept only 0x111, 0x112 and 0x113 IDs*/
     Can_Dst_Filter.number               = 0u;
