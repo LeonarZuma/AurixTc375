@@ -19,7 +19,7 @@ static AppRtcc_Rtcc RTCC_struct;
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
 
-static void Clock_State_Machine(void);
+static void AppClock_StateMachine(void);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -55,7 +55,7 @@ void AppClock_periodicTask( void )
     // AppRtcc_getAlarm(&RTCC_struct, &al_hour, &al_min);
     // set_alarmString(al_string, al_hour, al_min);
 
-    Clock_State_Machine();
+    AppClock_StateMachine();
 }
 
 void AppClock_RTCCUpdate_Callback()
@@ -68,7 +68,7 @@ void AppClock_RTCCUpdate_Callback()
 /*                         Implementation of local functions                  */
 /*----------------------------------------------------------------------------*/
 
-static void Clock_State_Machine(void)
+static void AppClock_StateMachine(void)
 {
     /* create a queue message container to write for the rtcc queue */
     App_Message data2Read;
