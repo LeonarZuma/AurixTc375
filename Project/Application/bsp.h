@@ -7,7 +7,7 @@
 
 #include "stdint.h"
 
-#include "Can/Can/IfxCan_Can.h"
+#include "IfxCan_Can.h"
 
 #include "Phase1.h"
 #include "Scheduler.h"

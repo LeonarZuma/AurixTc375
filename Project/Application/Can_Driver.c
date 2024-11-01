@@ -14,9 +14,7 @@ static IfxCan_Can Can;
 static IfxCan_Can_Config Can_Config;
 static IfxCan_Can_Node Can_Node;
 static IfxCan_Can_NodeConfig Can_Node_Config;
-static IfxCan_Filter Can_Dst_Filter;
 static IfxCan_Message Tx_Message[TX_MSG_NO];
-static uint8 messageFlag;
 
 /*Define a structure that contains the pins to be configured as CAN pins*/
 static IFX_CONST IfxCan_Can_Pins Can_Pins =
@@ -51,7 +49,7 @@ void AppClock_CAN_Init(void)
     Can_Node_Config.pins              = &Can_Pins;
     Can_Node_Config.baudRate.baudrate = 100000u;
     Can_Node_Config.nodeId            = IfxCan_NodeId_3;              //Assign source CAN node to CAN node 1
-    Can_Node_Config.frame.mode        = IfxCan_FrameMode_standard;//Classic mode, 8 bytes frames
+    Can_Node_Config.frame.mode        = IfxCan_FrameMode_fdLong;//Classic mode, 8 bytes frames
     Can_Node_Config.frame.type        = IfxCan_FrameType_transmit;//define the frame to be the transmitting one
 
 
@@ -71,7 +69,7 @@ void AppClock_CAN_Init(void)
         Tx_Message[index].messageId        = 0x201 + (index * 0x11);                            /*ID*/            
         Tx_Message[index].messageIdLength  = IfxCan_MessageIdLength_standard;  /*11 bit ID message*/
         Tx_Message[index].dataLengthCode   = IfxCan_DataLengthCode_8;          /*8 byes to send*/
-        Tx_Message[index].frameMode        = IfxCan_FrameMode_standard;           /*classic frame*/
+        Tx_Message[index].frameMode        = IfxCan_FrameMode_fdLong;           /*classic frame*/
         Tx_Message[index].storeInTxFifoQueue   = TRUE;           /*classic frame*/
 
     }
