@@ -77,6 +77,10 @@ void AppClock_periodicTask( void )
     Clock_State_Machine();
 }
 
+void AppClock_RTCCUpdate_Callback()
+{
+    AppRtcc_periodicTask(&RTCC_struct);
+}
 
 
 /*----------------------------------------------------------------------------*/
@@ -108,7 +112,7 @@ static void Clock_State_Machine(void)
                 }
                 else
                 {
-                    /* do nothing */
+                    /* do nothing the current state is keep */
                 }
                 break;
             case CLOCK_MESSAGE:
