@@ -136,16 +136,10 @@ static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
                 AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min);
                 current_state = CLOCK_IDLE;
                 break;
-            case SENT_TIME:
-                /* get time and send it to a queue to be */
-                current_state = CLOCK_IDLE;
-                break;
-            case SENT_DATE:
-                break;
             default:
                 break;
         }
-    } while (current_state != CLOCK_IDLE);
+    } while (current_state != CLOCK_IDLE || queue_content.size > 0);
 }
 
 static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content)
