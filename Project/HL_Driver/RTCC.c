@@ -88,7 +88,7 @@ static void AppRtcc_updTime(AppRtcc_Rtcc *rtcc)
  * @retval  <valInRange> The enter value is inside the range TRUE, otherwise FALSE
  *
  */
-static uint8_t AppRtcc_valInRange(uint16_t infLim, uint8_t value, uint16_t supLim)
+static uint8_t AppRtcc_valInRange(uint16_t infLim, uint16_t value, uint16_t supLim)
 {
     uint8_t valInRange = FALSE;
     

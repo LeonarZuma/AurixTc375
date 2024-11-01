@@ -20,11 +20,11 @@ static AppRtcc_Rtcc RTCC_struct;
 
 static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content);
 
-static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content);
+static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t *queue_content);
 
-static void AppClock_CanTx_DateTime(App_TmTime data);
+static void AppClock_CanTx_DateTime(App_TmTime *data);
 
-static void AppClock_getTimeDate(App_TmTime data);
+static void AppClock_getTimeDate(App_TmTime *data);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -55,7 +55,7 @@ void AppClock_periodicTask( void )
     };
 
     /* Read all the queue elements from the ss2rtcc */
-    AppClock_ReadAllQueue(ssm2rtcc_queue_content);
+    AppClock_ReadAllQueue(&ssm2rtcc_queue_content);
 
     /* Execute state machine with the elements of the queue that has been read */
     AppClock_StateMachine(ssm2rtcc_queue_content);
@@ -69,10 +69,10 @@ void AppClock_RTCCUpdate_Callback()
     AppRtcc_periodicTask(&RTCC_struct);
 
     /* get time and date */
-    AppClock_getTimeDate(datetime_data);
+    AppClock_getTimeDate(&datetime_data);
 
     /* send time and data over can bus */
-    AppClock_CanTx_DateTime(datetime_data);
+    AppClock_CanTx_DateTime(&datetime_data);
 }
 
 
@@ -142,24 +142,24 @@ static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
     } while (current_state != CLOCK_IDLE || queue_content.size > 0);
 }
 
-static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content)
+static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t *queue_content)
 {
     while (AppQueue_isQueueEmpty(&ssm2rtcc_queue) == FALSE)
     {
-        queue_content.state &= ~(0b1);  /* Set this variable as TRUE to indicate a reading has been perfomed */     
-        AppQueue_readDataIsr(&ssm2rtcc_queue, &queue_content.data[queue_content.size]);
-        queue_content.size ++;
+        queue_content->state |= (0b1);  /* Set this variable as TRUE to indicate a reading has been perfomed */     
+        AppQueue_readDataIsr(&ssm2rtcc_queue, &queue_content->data[queue_content->size]);
+        queue_content->size ++;
     }
 }
 
-static void AppClock_CanTx_DateTime(App_TmTime data)
+static void AppClock_CanTx_DateTime(App_TmTime *data)
 {
     /* Defien the data array */
     uint8_t datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-    datatx[0] = AppClock_Can_Decimal2BCD(data.tm_hour);
-    datatx[1] = AppClock_Can_Decimal2BCD(data.tm_min);
-    datatx[2] = AppClock_Can_Decimal2BCD(data.tm_sec);
+    datatx[0] = AppClock_Can_Decimal2BCD(data->tm_hour);
+    datatx[1] = AppClock_Can_Decimal2BCD(data->tm_min);
+    datatx[2] = AppClock_Can_Decimal2BCD(data->tm_sec);
 
     /* Pack message in CAN-TP format */    
     CanTp_SingleFrameTx(datatx, 3);
@@ -167,10 +167,10 @@ static void AppClock_CanTx_DateTime(App_TmTime data)
     /* Send time over CAN */
     AppClock_Can_SendTime(APPCLOCK_TIME, (uint8_t *)&datatx);
 
-    datatx[0] = AppClock_Can_Decimal2BCD(data.tm_wday);
-    datatx[1] = AppClock_Can_Decimal2BCD(data.tm_mon);
-    datatx[2] = AppClock_Can_Decimal2BCD((uint8_t)(data.tm_year & 0xF));
-    datatx[3] = AppClock_Can_Decimal2BCD((uint8_t)(data.tm_year >> 0x4));
+    datatx[0] = AppClock_Can_Decimal2BCD(data->tm_mday);
+    datatx[1] = AppClock_Can_Decimal2BCD(data->tm_mon);
+    datatx[2] = AppClock_Can_Decimal2BCD((uint8_t)(data->tm_year /100));
+    datatx[3] = AppClock_Can_Decimal2BCD((uint8_t)(data->tm_year % 100));
 
     /* Pack message in CAN-TP format */
     CanTp_SingleFrameTx(datatx, 4);
@@ -179,11 +179,11 @@ static void AppClock_CanTx_DateTime(App_TmTime data)
     AppClock_Can_SendTime(APPCLOCK_DATE, (uint8_t *)&datatx);
 }
 
-static void AppClock_getTimeDate(App_TmTime data)
+static void AppClock_getTimeDate(App_TmTime *data)
 {
     // /* Create the string to print the current time hour, minutes and seconds*/
-    AppRtcc_getTime(&RTCC_struct, &data.tm_hour, &data.tm_min, &data.tm_sec);
+    AppRtcc_getTime(&RTCC_struct, &data->tm_hour, &data->tm_min, &data->tm_sec);
 
     // /* Create the string to print the current Date Month, Day, Year, Weekday */
-    AppRtcc_getDate(&RTCC_struct, &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_wday);
+    AppRtcc_getDate(&RTCC_struct, &data->tm_mday, &data->tm_mon, &data->tm_year, &data->tm_wday);
 }
