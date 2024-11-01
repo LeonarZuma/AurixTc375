@@ -63,7 +63,10 @@ void AppClock_periodicTask( void )
         .state = FALSE
     };
 
+    /* Read all the queue elements from the ss2rtcc */
     AppClock_ReadAllQueue(ssm2rtcc_queue_content);
+
+    /* Execute state machine with the elements of the queue that has been read */
     AppClock_StateMachine(ssm2rtcc_queue_content);
 }
 
