@@ -69,7 +69,9 @@ void AppClock_periodicTask( void )
 
 void AppClock_RTCCUpdate_Callback()
 {
+    /* update Rtcc time*/
     AppRtcc_periodicTask(&RTCC_struct);
+    /* send time and data over can bus */
 }
 
 
@@ -84,9 +86,6 @@ static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
     
     /* define the init CSM state */
     CSM_states current_state = CLOCK_IDLE;
-
-    /* Defien the data array */
-    uint8_t can_datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     do
     {
@@ -150,4 +149,16 @@ static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t queue_content)
         AppQueue_readDataIsr(&ssm2rtcc_queue, &queue_content.data[queue_content.size]);
         queue_content.size ++;
     }
+}
+
+static void AppClock_Can_DateTime()
+{
+    /* Defien the data array */
+    uint8_t datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    /* Send date over CAN */
+    AppClock_Can_SendTime(APPCLOCK_DATE, datatx);
+
+    /* Send time over CAN */
+    AppClock_Can_SendTime(APPCLOCK_TIME, datatx);
 }

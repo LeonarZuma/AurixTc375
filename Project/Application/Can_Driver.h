@@ -5,6 +5,6 @@
 
 void AppClock_CAN_Init(void);
 
-void AppClock_Can_SendTime(uint8_t *data);
+void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data);
 
 #endif
