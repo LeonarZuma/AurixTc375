@@ -89,8 +89,7 @@ static void Clock_State_Machine(void)
     App_Message data2Read;
     
     /* define the init CSM state */
-    // CSM_states current_state = IDLE;
-    CSM_states current_state = SENT_TIME;
+    CSM_states current_state = CLOCK_IDLE;
 
     /* Defien the data array */
     uint8_t can_datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -143,7 +142,7 @@ static void Clock_State_Machine(void)
                 current_state = CLOCK_IDLE;
                 break;
             case SENT_TIME:
-                AppClock_Can_SendTime(&can_datatx);
+                /* get time and send it to a queue to be */
                 current_state = CLOCK_IDLE;
                 break;
             case SENT_DATE:

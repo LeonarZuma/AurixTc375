@@ -86,7 +86,7 @@ void core0_main(void)
 
     /*get the number of ticks corresponding to 10ms */
     Timeout_10ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
-    Timeout_50ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK1_VAL));
+    Timeout_50ms = (uint64)IfxStm_getTicksFromMilliseconds(&MODULE_STM0, (TICK_VAL * TASK2_VAL));
 
     AppSched_registerTask(&Sche_core0, AppSerial_initTask, AppSerial_periodicTask, Timeout_10ms);
     AppSched_registerTask(&Sche_core0, AppClock_initTask, AppClock_periodicTask, Timeout_50ms);
