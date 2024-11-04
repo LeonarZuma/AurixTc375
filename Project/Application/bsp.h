@@ -16,6 +16,7 @@
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
 #define MUTEX_uS_WAIT           (100U)      /*!<uS Mutex wait time>*/
+#define MSG_PDU_BYTES           (8U)
 #define QUEUE_BUFFER_SIZE       (8U)
 #define ID_111_PDU_BYTES        (3)
 #define ID_112_PDU_BYTES        (4)
