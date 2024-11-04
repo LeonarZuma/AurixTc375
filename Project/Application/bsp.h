@@ -15,8 +15,11 @@
 /*----------------------------------------------------------------------------*/
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
-#define MUTEX_uS_WAIT       (100U)      /*!<uS Mutex wait time>*/
-#define QUEUE_BUFFER_SIZE   (8U)
+#define MUTEX_uS_WAIT           (100U)      /*!<uS Mutex wait time>*/
+#define QUEUE_BUFFER_SIZE       (8U)
+#define ID_111_PDU_BYTES        (3)
+#define ID_112_PDU_BYTES        (4)
+#define ID_113_PDU_BYTES        (2)
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
