@@ -61,6 +61,8 @@ static void Queue_SSM2RTCC_Init(void);
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year);
 
+static uint8_t Serial_Can_BCD2Decimal (uint8_t data);
+
 static void Serial_State_Machine(void);
 
 /*----------------------------------------------------------------------------*/
@@ -176,7 +178,7 @@ static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
     uint8_t local_validation = FALSE;
     uint8_t days_by_month[12] = {31, (28 + ((year % 4) == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
-    if((1 <= days && days <= days_by_month[month]) &&
+    if((1 <= days && days <= days_by_month[month - 1]) &&
      (1 <= month && month <= APPSERIAL_MAX_MOS) && 
      (APPSERIAL_MIN_YEAR <= year && year <= APPSERIAL_MAX_YEAR))
     {
@@ -305,7 +307,14 @@ static void Queue_SSM2RTCC_Init(void)
 
 static uint16_t YearPdu_ToAppMessage(uint8_t* year)
 {
-    return ((year[0] >> 4) * 1000) + ((year[0] & 0x0F) * 100) + ((year[1] >> 4) * 10) + (year[1] & 0x0F);
+    return (Serial_Can_BCD2Decimal(year[0]) * 100) + (Serial_Can_BCD2Decimal(year[1]));
+}
+
+static uint8_t Serial_Can_BCD2Decimal (uint8_t data)
+{
+    uint8_t tens = (data >> 0x4) * (0xA);
+    uint8_t units = data & 0xF;
+    return (tens + units);
 }
 
 static void Serial_State_Machine(void)
@@ -373,6 +382,10 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case TIME:
+                /* Perform conversion from BCD type to Decimal for the income data */
+                data2Read.sdu[HR] = Serial_Can_BCD2Decimal(data2Read.sdu[HR]);
+                data2Read.sdu[MIN] = Serial_Can_BCD2Decimal(data2Read.sdu[MIN]);
+                data2Read.sdu[SEC] = Serial_Can_BCD2Decimal(data2Read.sdu[SEC]);
                 /* check if the receive time in payload is valid */
                 if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]) == TRUE)
                 {
@@ -392,7 +405,10 @@ static void Serial_State_Machine(void)
                 }
                 break;
             case DATE:
+                /* Perform conversion from BCD type to Decimal for the income data */  
                 year = YearPdu_ToAppMessage(&data2Read.sdu[YR1]);
+                data2Read.sdu[DAY] = Serial_Can_BCD2Decimal(data2Read.sdu[DAY]);
+                data2Read.sdu[MO] = Serial_Can_BCD2Decimal(data2Read.sdu[MO]);
                 /* check if the receive date is a valid one */
                 valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
                 if (valid_date == TRUE)
@@ -412,7 +428,11 @@ static void Serial_State_Machine(void)
                     current_state = ERROR;
                 }
                 break;
+
             case ALARM:
+                /* Perform conversion from BCD type to Decimal for the income data */
+                data2Read.sdu[HR] = Serial_Can_BCD2Decimal(data2Read.sdu[HR]);
+                data2Read.sdu[MIN] = Serial_Can_BCD2Decimal(data2Read.sdu[MIN]);
                 /* check if the alarm set time is a valid value */
                 if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0) == TRUE)
                 {
