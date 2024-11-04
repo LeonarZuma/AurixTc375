@@ -55,11 +55,9 @@ static uint8_t Serial_getWeekDay( uint8_t days, uint8_t month, uint16_t year );
 
 static void CAN_Init(void);
 
-static void Queue_CAN2SSM_Init(void);
+static void Serial_Queue_CAN2SSM_Init(void);
 
-static void Queue_SSM2RTCC_Init(void);
-
-static uint16_t YearPdu_ToAppMessage(uint8_t* year);
+static void Serial_Queue_SSM2RTCC_Init(void);
 
 static uint8_t Serial_BCD2Decimal(uint8_t data);
 
@@ -75,8 +73,8 @@ static void Serial_State_Machine(void);
 void AppSerial_initTask( void )
 {
     CAN_Init();
-    Queue_CAN2SSM_Init();
-    Queue_SSM2RTCC_Init();
+    Serial_Queue_CAN2SSM_Init();
+    Serial_Queue_SSM2RTCC_Init();
 }
 
 void AppSerial_periodicTask( void )
@@ -101,7 +99,7 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
     data2Write.pci = Rx_Message.messageId;
 
     /* The function extracts the payload and the id from the receive message. Putting the information inside a queue message to send */
-    Serial_singleFrameRx( &data2Write.sdu, &size);
+    Serial_singleFrameRx((uint8_t *)&data2Write.sdu, &size);
     
     /*!< set a breakpoint after the function  and see the message received using the debugger */
     messageFlag = 1u;
@@ -115,47 +113,12 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 /*----------------------------------------------------------------------------*/
 static void Serial_singleFrameTx( uint8_t *data, uint8_t size )
 {
-    const uint8_t can_frame_size = 8;
-    uint8_t local_data[can_frame_size];
-    
-    /* move to shift one position right the array elements */
-    arrayCopy(data, local_data,can_frame_size, 1);
-    arrayCopy(local_data, data, can_frame_size, 0);
-
-    /* Insert the first data element */
-    /* Set the MSN will always be zero */
-    /* Set the LSN to the number of */
-    if (size > 7)
-    {
-        size = 7;
-    }
-    else
-    {
-        /* Do nothing */
-    }
-    *data = size & (~0xFFF8);
+    CanTp_SingleFrameTx(data, size);
 }
     
 static uint8_t Serial_singleFrameRx( uint8_t *data, uint8_t *size )
 {
-    const uint8_t can_frame_size = 8;
-    uint8_t local_data[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-    uint8_t local_validation = CAN_SING_FRAME_INVALID;
-    /* We are taking out the value of size from the CAN frame */
-    *size = *data;
-    if(*data <= 0x07)
-    {
-        *data = 0;
-        local_validation = CAN_SING_FRAME_VALID;
-        arrayCopy(data, local_data, can_frame_size, -1);
-        arrayCopy(local_data, data, can_frame_size, 0);
-    }
-    else
-    {
-        /* Do nothing */
-    }
-    return local_validation;
+    return CanTp_SingleFrameRx(data, size);
 }
 
 static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t seconds )
@@ -178,7 +141,7 @@ static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t secon
 static uint8_t Serial_validateDate( uint8_t days, uint8_t month, uint16_t year )
 {
     uint8_t local_validation = FALSE;
-    uint8_t days_by_month[12] = {31, (28 + ((year % 4) == 0)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    uint8_t days_by_month[12] = {31, (28 + Serial_validateLeapYear(year)), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
     if((1 <= days && days <= days_by_month[month - 1]) &&
      (1 <= month && month <= APPSERIAL_MAX_MOS) && 
@@ -279,7 +242,7 @@ static void CAN_Init(void)
     IfxCan_Can_setStandardFilter( &Can_Node, &Can_Dst_Filter );
 }
 
-static void Queue_CAN2SSM_Init(void)
+static void Serial_Queue_CAN2SSM_Init(void)
 {
     
     /* Set the buffer for the Queue */
@@ -293,7 +256,7 @@ static void Queue_CAN2SSM_Init(void)
     AppQueue_initQueue(&can2ssm_queue);
 }
 
-static void Queue_SSM2RTCC_Init(void)
+static void Serial_Queue_SSM2RTCC_Init(void)
 {
     
     /* Set the buffer for the Queue */
@@ -305,11 +268,6 @@ static void Queue_SSM2RTCC_Init(void)
 
     /* Init queue Function call */
     AppQueue_initQueue(&ssm2rtcc_queue);
-}
-
-static uint16_t YearPdu_ToAppMessage(uint8_t* year)
-{
-    return ((year[0] * 100) + (year[1]));
 }
 
 static uint8_t Serial_BCD2Decimal(uint8_t data)
@@ -393,8 +351,8 @@ static void Serial_State_Machine(void)
                 break;
             case TIME:
                 /* Perform conversion from BCD type to Decimal for the income data */
-                Serial_CanRxData_BCD2Decimal(&data2Read.sdu, ID_111_PDU_BYTES);
-                
+                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_111_PDU_BYTES);
+
                 /* check if the receive time in payload is valid */
                 if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]) == TRUE)
                 {
@@ -415,8 +373,8 @@ static void Serial_State_Machine(void)
                 break;
             case DATE:
                 /* Perform conversion from BCD type to Decimal for the income data */  
-                Serial_CanRxData_BCD2Decimal(&data2Read.sdu, ID_112_PDU_BYTES);
-                year = YearPdu_ToAppMessage(&data2Read.sdu[YR1]);
+                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_112_PDU_BYTES);
+                year = ((data2Read.sdu[YR1] * 100) + (data2Read.sdu[YR0]));
 
                 /* check if the receive date is a valid one */
                 valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
@@ -440,7 +398,7 @@ static void Serial_State_Machine(void)
 
             case ALARM:
                 /* Perform conversion from BCD type to Decimal for the income data */
-                Serial_CanRxData_BCD2Decimal(&data2Read.sdu, ID_113_PDU_BYTES);
+                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_113_PDU_BYTES);
 
                 /* check if the alarm set time is a valid value */
                 if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0) == TRUE)
@@ -465,7 +423,7 @@ static void Serial_State_Machine(void)
                 current_state = IDLE;
                 /* Packing bytes to send via CAN*/
                 can_datatx[0] = 0xAA;
-                Serial_singleFrameTx( &can_datatx, 1);
+                Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send NOK message via CAN */
                 IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );
@@ -481,7 +439,7 @@ static void Serial_State_Machine(void)
                 
                 /* Packing bytes to send via CAN*/
                 can_datatx[0] = 0x55;
-                Serial_singleFrameTx( &can_datatx, 1);
+                Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send OK message via CAN */
                 IfxCan_Can_sendMessage( &Can_Node, &Tx_Message, (uint32*)&can_datatx[ 0u ] );

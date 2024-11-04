@@ -46,7 +46,7 @@ static AppSched_Scheduler *intScheduler0 = NULL;
 static AppSched_Scheduler *intScheduler1 = NULL;
 static AppSched_Scheduler *intScheduler2 = NULL;
 
-#ifdef SCHD_INT_MODE
+#if (SCHD_INT_MODE)
 /**
  * @brief   **calculates the current time passed on milliseconds **
  *

@@ -27,7 +27,14 @@
 #define SCHEDULER_H_
 
 #define IFX_INTPRIO_STM0_CMP0    10
-#define SCHD_INT_MODE ACTIVE
+
+typedef enum
+{
+  SCHD_INT_MODE_INACTIVE = 0,
+  SCHD_INT_MODE_ACTIVE = 1
+}SCHD_INT_MODES;
+
+#define SCHD_INT_MODE            SCHD_INT_MODE_INACTIVE
 
 /**
   * @brief    Task control block structure
