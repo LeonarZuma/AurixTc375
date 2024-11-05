@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "IfxCan_Can.h"
-#include "bsp.h"
 
 /*----------------------------------------------------------------------------*/
 /*                               Local defines                                */
@@ -23,8 +22,14 @@ typedef struct
     IfxCan_Filter Can_Dst_Filter;                               /* CAN filter configuration structure                */
     IfxCan_Message Tx_Message[TX_MSG_NO];                       /* Transmitted CAN message structure                 */
     IfxCan_Message Rx_Message;                                  /* Received CAN message structure                    */
-    uint8 Rx_Data[3u][MSG_PDU_BYTES];                           /* Received CAN data matrix                */
 } mcmcanType;
+
+typedef struct
+{
+    uint16_t txmessage_idx;
+    IfxCan_Can_Node *Can_Node;
+    IfxCan_Message *Tx_Message;
+} Can_Txmsg_Config;
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
@@ -51,6 +56,8 @@ typedef struct
 /*----------------------------------------------------------------------------*/
 
 void AppClock_CAN_Init(void);
+
+void AppSerial_CAN_Init(void);
 
 void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data);
 
