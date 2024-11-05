@@ -2,7 +2,6 @@
 TARGET = Test
 # Application source files to compile
 SRCS  = Cpu0_Main.c Cpu1_Main.c Cpu2_Main.c Bsp.c Assert.c sync_on_halt.c
-SRCS += Button.c Led.c
 SRCS += Buffer.c Queue.c Scheduler.c Phase1.c RTCC.c
 SRCS += AppSerial.c AppClock.c Can_Driver.c
 SRCS += CompilerGcc.c CompilerDcc.c CompilerGhs.c CompilerGnuc.c CompilerTasking.c 

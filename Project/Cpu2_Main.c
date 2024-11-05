@@ -34,7 +34,6 @@
 #include "Phase1.h"
 #include "Scheduler.h"
 #include "RTCC.h"
-#include "Button.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
@@ -52,9 +51,6 @@
 /*STM comparator 0*/
 #define CMP0                     0
 
-/* Global variables */
-Btn_Config btn_cnfg7;
-
 static AppSched_Task tasks[ TASKS_N ];
 static AppSched_Timer timers[ N_TIMERS ];
 static AppSched_Scheduler Sche_core2;
@@ -62,7 +58,6 @@ static AppSched_Scheduler Sche_core2;
 /* Functions */
 void Core2_Init_Task_100ms(void);
 void Core2_Task_100ms(void);
-void Func_Btn7(void);
 
 extern IfxCpu_syncEvent g_cpuSyncEvent;
 
@@ -105,23 +100,4 @@ void core2_main(void)
 
     
     AppSched_startScheduler(&Sche_core2);
-}
-
-void Core2_Init_Task_100ms(void)
-{
-    /*configure the pin */
-    IfxPort_setPinMode( &MODULE_P00, 9, IfxPort_Mode_outputPushPullGeneral );
-    IfxPort_setPinPadDriver( &MODULE_P00, 9, IfxPort_PadDriver_cmosAutomotiveSpeed1 );
-
-    Button_Init(&btn_cnfg7, &MODULE_P21, 5, Func_Btn7);
-}
-
-void Core2_Task_100ms(void)
-{
-    Button_pressedAndReleased(&btn_cnfg7);
-}
-
-void Func_Btn7(void)
-{
-    IfxPort_togglePin( &MODULE_P00, 9 );
 }

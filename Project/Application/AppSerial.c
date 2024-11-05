@@ -49,7 +49,7 @@ static void Serial_State_Machine(void);
 
 void AppSerial_initTask( void )
 {
-    AppSerial_CAN_Init();
+    CAN_Init_AppSerial();
     Serial_Queue_CAN2SSM_Init();
     Serial_Queue_SSM2RTCC_Init();
 }
