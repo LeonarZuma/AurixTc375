@@ -3,12 +3,12 @@
 /*----------------------------------------------------------------------------*/
 /*                                  Includes                                  */
 /*----------------------------------------------------------------------------*/
+#include "stdint.h"
 #include "Can/Can/IfxCan_Can.h"
 
 /*----------------------------------------------------------------------------*/
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
-#define ISR_PRIORITY_CAN_RX     (1)
 
 /** 
   * @defgroup <Time Bouds> Time count boundaries
@@ -78,5 +78,7 @@ typedef enum
 void AppSerial_initTask( void );
 
 void AppSerial_periodicTask( void );
+
+void Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id);
 
 #endif

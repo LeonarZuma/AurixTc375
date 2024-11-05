@@ -21,6 +21,8 @@
 #define ID_111_PDU_BYTES        (3)
 #define ID_112_PDU_BYTES        (4)
 #define ID_113_PDU_BYTES        (2)
+/* CAN defines */
+#define ISR_PRIORITY_CAN_RX     (1)
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
