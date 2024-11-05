@@ -240,13 +240,13 @@ static void Serial_State_Machine(void)
                 /* Check if the receive message is valid */
                 switch (data2Read.pci)
                 {
-                    case 0x111:
+                    case CANRX_TIME_MSG_ID:
                         current_state = TIME;
                         break;
-                    case 0x112:
+                    case CANRX_DATE_MSG_ID:
                         current_state = DATE;
                         break;
-                    case 0x113:
+                    case CANRX_ALARM_MSG_ID:
                         current_state = ALARM;
                         break;
                     default:
@@ -331,7 +331,7 @@ static void Serial_State_Machine(void)
                 Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send NOK message via CAN */
-                Can_Send_Message((uint16_t)0x122, (uint32*)&can_datatx[ 0u ]);
+                Can_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ]);
 
                 break;
 
@@ -340,14 +340,14 @@ static void Serial_State_Machine(void)
                 current_state = IDLE;
                 
                 /* Send the message from SSM To RTCC queue */
-                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, 10);
+                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
                 
                 /* Packing bytes to send via CAN*/
                 can_datatx[0] = 0x55;
                 Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send OK message via CAN */
-                Can_Send_Message((uint16_t)0x122, (uint32*)&can_datatx[ 0u ]);
+                Can_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ]);
 
                 break;
 

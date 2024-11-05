@@ -17,6 +17,11 @@
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
+#define CANTX_TIME_MSG_ID         (0x212)
+#define CANTX_DATE_MSG_ID         (0x201)
+#define CANTX_TIME_PDU_BYTES      (3)
+#define CANTX_DATE_PDU_BYTES      (4)
+
 typedef enum
 {
     CLOCK_IDLE = 0,

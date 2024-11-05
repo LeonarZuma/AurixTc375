@@ -70,7 +70,7 @@ void AppClock_CAN_Init(void)
 
     /* Configure Tx buffer for transmision */
     mcmcan_node1.Can_Node_Config.txConfig.txMode = IfxCan_TxMode_fifo;
-    mcmcan_node1.Can_Node_Config.txConfig.txFifoQueueSize = 8;
+    mcmcan_node1.Can_Node_Config.txConfig.txFifoQueueSize = MSG_PDU_BYTES;
 
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &mcmcan_node1.Can_Node, &mcmcan_node1.Can_Node_Config );
@@ -124,7 +124,7 @@ void AppSerial_CAN_Init(void)
     /* Configure Tx buffer for transmision */
     mcmcan_node0.Can_Node_Config.txConfig.txMode = IfxCan_TxMode_fifo;
     mcmcan_node0.Can_Node_Config.txConfig.txFifoQueueSize = 8;
-    mcmcan_node0.Can_Node_Config.txConfig.txBufferDataFieldSize = 8;
+    mcmcan_node0.Can_Node_Config.txConfig.txBufferDataFieldSize = MSG_PDU_BYTES;
 
     /* initialize the source CAN node with the modified configuration*/
     IfxCan_Can_initNode( &mcmcan_node0.Can_Node, &mcmcan_node0.Can_Node_Config );
