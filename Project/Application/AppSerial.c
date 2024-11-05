@@ -61,7 +61,7 @@ void AppSerial_periodicTask( void )
     
 }
 
-void Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id)
+void AppSerial_Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id)
 {
     /* Container for the input message to send to the queue */
     App_Pdu data2Write;

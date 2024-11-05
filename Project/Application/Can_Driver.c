@@ -186,7 +186,7 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 
     /* Used of callback function to avoid the usage of many resources from the AppSerial */
     /* This line performs a send to queue the receive data */
-    Callback_CanRx2Queue((uint8_t*)&Rx_Data, mcmcan_node0.Rx_Message.messageId);
+    AppSerial_Callback_CanRx2Queue((uint8_t*)&Rx_Data, mcmcan_node0.Rx_Message.messageId);
 }
 
 /*----------------------------------------------------------------------------*/
