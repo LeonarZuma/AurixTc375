@@ -3,6 +3,7 @@
 /*----------------------------------------------------------------------------*/
 #include "stdint.h"
 #include "bsp.h"
+
 #include "Can_Driver.h"
 #include "AppSerial.h"
 
@@ -11,8 +12,8 @@
 /*----------------------------------------------------------------------------*/
 
 /*Can configuration structures*/
-mcmcanType mcmcan_node0;
-mcmcanType mcmcan_node1;
+static mcmcanType mcmcan_node0;
+static mcmcanType mcmcan_node1;
 
 /*Define a structure that contains the pins to be configured as CAN pins*/
 static IFX_CONST IfxCan_Can_Pins Can_Pins_node1 =
@@ -22,6 +23,13 @@ static IFX_CONST IfxCan_Can_Pins Can_Pins_node1 =
     .rxPin      = &IfxCan_RXD13B_P33_5_IN,
     .rxPinMode  = IfxPort_InputMode_pullUp,
     .padDriver  = IfxPort_PadDriver_cmosAutomotiveSpeed4
+};
+
+static Can_Txmsg_Config txmessages_cfg[]=
+{
+    {0x122, &mcmcan_node0.Can_Node, &mcmcan_node0.Tx_Message[0]},
+    {0x201, &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[0]},
+    {0x212, &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[1]}
 };
 
 IFX_CONST IfxCan_Can_Pins Can_Pins_node0 =
@@ -36,10 +44,10 @@ IFX_CONST IfxCan_Can_Pins Can_Pins_node0 =
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
-
+static Can_Txmsg_Config Can_HashTable(uint16_t id);
 
 /*----------------------------------------------------------------------------*/
-/*                         Implementation of local functions                  */
+/*                         Implementation of global functions                 */
 /*----------------------------------------------------------------------------*/
 void AppClock_CAN_Init(void)
 {
@@ -149,33 +157,14 @@ void AppSerial_CAN_Init(void)
     IfxCan_Can_setStandardFilter( &mcmcan_node0.Can_Node, &mcmcan_node0.Can_Dst_Filter );
 }
 
-
-void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data)
+void Can_Send_Message(uint16_t txmessage_idx, uint8_t *data)
 {
-    IfxCan_Can_sendMessage( &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[txmessage_idx], (uint32*)&data[ 0u ] );
-}
+    /* container to save the matching value from the hash table */
+    Can_Txmsg_Config local_value;
+    /* look using the hash table the corresponding data structure for a given message id */
+    local_value = Can_HashTable(txmessage_idx);
 
-void AppSerial_Can_SendRe(uint8_t txmessage_idx, uint8_t *data)
-{
-    IfxCan_Can_sendMessage( &mcmcan_node0.Can_Node, &mcmcan_node0.Tx_Message[txmessage_idx], (uint32*)&data[ 0u ] );
-}
-
-Can_Txmsg_Config txmessages_cfg[]=
-{
-    {0x122, &mcmcan_node0.Can_Node, &mcmcan_node0.Tx_Message[0]},
-    {0x201, &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[0]},
-    {0x212, &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[1]}
-};
-
-uint8 hash_table(uint8 id)
-{
-    
-}
-
-void Can_Send_Message(uint8_t txmessage_idx, uint8_t *data)
-{
-    /* asignar el nodo especifico de configuracion y ademas la configuracion de mensaje */
-    // IfxCan_Can_sendMessage(,(uint32*)&data[ 0u ]);
+    IfxCan_Can_sendMessage( local_value.Can_Node, local_value.Tx_Message, (uint32*)&data[ 0u ] );
 }
 
 uint8_t AppClock_Can_Decimal2BCD (uint8_t data)
@@ -199,4 +188,34 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
     /* Used of callback function to avoid the usage of many resources from the AppSerial */
     /* This line performs a send to queue the receive data */
     Callback_CanRx2Queue((uint8_t*)&Rx_Data, mcmcan_node0.Rx_Message.messageId);
+}
+
+/*----------------------------------------------------------------------------*/
+/*                         Implementation of private functions                */
+/*----------------------------------------------------------------------------*/
+static Can_Txmsg_Config Can_HashTable(uint16_t id)
+{
+    /* container to save the matching value from the hash table */
+    Can_Txmsg_Config local_value = {0, NULL, NULL};
+    /* flag to perform an early escape from the for loop */
+    uint8_t flag = FALSE;
+
+    for(uint8_t index = 0; index < CAN_TX_MESSAGES && !flag; index++)
+    {
+        if(txmessages_cfg[index].txmessage_idx == id)
+        {
+            local_value.txmessage_idx = txmessages_cfg[index].txmessage_idx;
+            local_value.Can_Node = txmessages_cfg[index].Can_Node;
+            local_value.Tx_Message = txmessages_cfg[index].Tx_Message;
+
+            /* Changing the flag state to perform an early escape from the for loop */
+            flag = TRUE;
+        }
+        else
+        {
+            /* do nothing */
+        }
+    }
+
+    return local_value;
 }

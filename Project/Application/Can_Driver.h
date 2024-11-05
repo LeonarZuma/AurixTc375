@@ -27,8 +27,8 @@ typedef struct
 typedef struct
 {
     uint16_t txmessage_idx;
-    IfxCan_Can_Node *Can_Node;
-    IfxCan_Message *Tx_Message;
+    IfxCan_Can_Node* Can_Node;
+    IfxCan_Message* Tx_Message;
 } Can_Txmsg_Config;
 
 /*----------------------------------------------------------------------------*/
@@ -61,6 +61,6 @@ void AppSerial_CAN_Init(void);
 
 void AppClock_Can_SendTime(uint8_t txmessage_idx, uint8_t *data);
 
-uint8_t AppClock_Can_Decimal2BCD (uint8_t data);
+uint8_t AppClock_Can_Decimal2BCD(uint8_t data);
 
 #endif

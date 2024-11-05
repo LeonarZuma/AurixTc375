@@ -26,6 +26,9 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
+#include "stdint.h"
+#include "IfxStm_regdef.h"
+
 #define IFX_INTPRIO_STM0_CMP0    10
 
 typedef enum

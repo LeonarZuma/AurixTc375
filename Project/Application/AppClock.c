@@ -165,7 +165,7 @@ static void AppClock_CanTx_DateTime(App_TmTime *data)
     CanTp_SingleFrameTx(datatx, 3);
 
     /* Send time over CAN */
-    AppClock_Can_SendTime(APPCLOCK_TIME, (uint8_t *)&datatx);
+    Can_Send_Message((uint16_t)0x212, (uint8_t *)&datatx);
 
     datatx[0] = AppClock_Can_Decimal2BCD(data->tm_mday);
     datatx[1] = AppClock_Can_Decimal2BCD(data->tm_mon);
@@ -176,7 +176,7 @@ static void AppClock_CanTx_DateTime(App_TmTime *data)
     CanTp_SingleFrameTx(datatx, 4);
 
     /* Send date over CAN */
-    AppClock_Can_SendTime(APPCLOCK_DATE, (uint8_t *)&datatx);
+    Can_Send_Message((uint16_t)0x201, (uint8_t *)&datatx);
 }
 
 static void AppClock_getTimeDate(App_TmTime *data)
