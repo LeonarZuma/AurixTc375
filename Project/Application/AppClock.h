@@ -12,8 +12,6 @@
 #ifndef GPSR0
     /*Software interrupt group 0*/
     #define GPSR0                     0
-    /*Software request node 0*/
-    #define SR0                       0
 #endif
 
 /*----------------------------------------------------------------------------*/

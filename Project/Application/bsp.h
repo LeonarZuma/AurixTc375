@@ -7,8 +7,6 @@
 
 #include "stdint.h"
 
-#include "IfxCan_Can.h"
-
 #include "Phase1.h"
 #include "Scheduler.h"
 #include "Queue.h"
@@ -23,6 +21,7 @@
 #define ID_113_PDU_BYTES        (2)
 /* CAN defines */
 #define ISR_PRIORITY_CAN_RX     (1)
+#define CAN_TX_MESSAGES     (3U)
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
