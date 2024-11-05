@@ -20,6 +20,11 @@
 #define APPSERIAL_MAX_YEAR          (2100)     /*!< MAX years count */
 #define APPSERIAL_MIN_YEAR          (1900)     /*!< MIN years count */
 
+#define CANTX_STATUS_MSG_ID         (0x122)
+#define CANRX_TIME_MSG_ID           (0x111)
+#define CANRX_DATE_MSG_ID           (0x112)
+#define CANRX_ALARM_MSG_ID          (0x113)
+
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
