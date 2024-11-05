@@ -97,9 +97,9 @@ static uint8_t Serial_validateTime( uint8_t hour, uint8_t minutes, uint8_t secon
 {
     uint8_t setTime = FALSE;
     /* Validate if the time is acceptable */
-    if ((0 <= hour && hour <= APPSERIAL_MAX_HRS) && 
-    (0 <= minutes && minutes <= APPSERIAL_MAX_MIN) && 
-    (0 <= seconds && seconds <= APPSERIAL_MAX_SEC))
+    if ((0 <= hour && hour < APPSERIAL_MAX_HRS) && 
+    (0 <= minutes && minutes < APPSERIAL_MAX_MIN) && 
+    (0 <= seconds && seconds < APPSERIAL_MAX_SEC))
     {
         setTime = TRUE;
     }
