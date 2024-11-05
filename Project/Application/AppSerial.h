@@ -84,6 +84,4 @@ void AppSerial_initTask( void );
 
 void AppSerial_periodicTask( void );
 
-void Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id);
-
 #endif

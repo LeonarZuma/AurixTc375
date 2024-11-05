@@ -5,7 +5,6 @@
 #include "bsp.h"
 
 #include "Can_Driver.h"
-#include "AppSerial.h"
 
 /*----------------------------------------------------------------------------*/
 /*                             Local data at RAM                              */
@@ -49,7 +48,7 @@ static Can_Txmsg_Config Can_HashTable(uint16_t id);
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of global functions                 */
 /*----------------------------------------------------------------------------*/
-void AppClock_CAN_Init(void)
+void CAN_Init_AppClock(void)
 {
     /*load default CAN module configuration into configuration structure*/
     IfxCan_Can_initModuleConfig( &mcmcan_node1.Can_Config, &MODULE_CAN1 );
@@ -90,7 +89,7 @@ void AppClock_CAN_Init(void)
     }
 }
 
-void AppSerial_CAN_Init(void)
+void CAN_Init_AppSerial(void)
 {
     /*load default CAN module configuration into configuration structure*/
     IfxCan_Can_initModuleConfig( &mcmcan_node0.Can_Config, &MODULE_CAN1 );

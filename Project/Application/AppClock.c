@@ -43,7 +43,7 @@ void AppClock_initTask( void )
     /* initialize the alarm*/
 
     /* Init Can for CSM */
-    AppClock_CAN_Init();
+    CAN_Init_AppClock();
 }
 
 void AppClock_periodicTask( void )

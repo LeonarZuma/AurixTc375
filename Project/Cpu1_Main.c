@@ -35,13 +35,7 @@
 
 #include "Scheduler.h"
 #include "RTCC.h"
-#include "Button.h"
 #include "Queue.h"
-
-#include "Can_Task.h"
-#include "App_bsp.h"
-#include "Mouse.h"
-#include "Leds.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)

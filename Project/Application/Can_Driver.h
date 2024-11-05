@@ -55,12 +55,15 @@ typedef struct
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
-void AppClock_CAN_Init(void);
+void CAN_Init_AppClock(void);
 
-void AppSerial_CAN_Init(void);
+void CAN_Init_AppSerial(void);
 
 void Can_Send_Message(uint16_t txmessage_idx, uint8_t *data);
 
 uint8_t AppClock_Can_Decimal2BCD(uint8_t data);
+
+
+void Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id);
 
 #endif
