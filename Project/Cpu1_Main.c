@@ -25,13 +25,11 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 #include <stdint.h>
-#include "Ifx_Types.h"
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 #include "IfxPort.h"
 #include "IfxPort_Io.h"
 #include "IfxStm.h"
-#include "Phase1.h"
 
 #include "Scheduler.h"
 #include "RTCC.h"
@@ -56,13 +54,6 @@
 
 /*STM0 module*/
 #define STM1                     1
-
-typedef struct
-{
-    uint8_t btn0_state;
-    uint8_t btn4_state;
-    uint8_t btn5_state;
-}BtnState_Buffer;
 
 static AppSched_Task tasks[ TASKS_N ];
 static AppSched_Timer timers[ N_TIMERS ];

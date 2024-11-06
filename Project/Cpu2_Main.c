@@ -25,12 +25,12 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 #include <stdint.h>
-#include "Ifx_Types.h"
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 #include "IfxPort.h"
 #include "IfxPort_Io.h"
 #include "IfxStm.h"
+
 #include "Phase1.h"
 #include "Scheduler.h"
 #include "RTCC.h"
