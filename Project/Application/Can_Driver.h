@@ -31,6 +31,9 @@ typedef struct
     IfxCan_Message* Tx_Message;
 } Can_Txmsg_Config;
 
+/* typedef for a better comprehension*/
+typedef void (*callback_func_t) (uint8_t *datarx, uint16_t message_id);
+
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
 /*----------------------------------------------------------------------------*/
@@ -62,8 +65,5 @@ void CAN_Init_AppSerial(void);
 void Can_Send_Message(uint16_t txmessage_idx, uint8_t *data);
 
 uint8_t AppClock_Can_Decimal2BCD(uint8_t data);
-
-
-void AppSerial_Callback_CanRx2Queue(uint8_t *datarx, uint16_t message_id);
 
 #endif

@@ -13,6 +13,8 @@
 static mcmcanType mcmcan_node0;
 static mcmcanType mcmcan_node1;
 
+extern callback_func_t ptr_AppSerial_Callback_CanRx2Queue;
+
 /*Define a structure that contains the pins to be configured as CAN pins*/
 static IFX_CONST IfxCan_Can_Pins Can_Pins_node1 =
 {
@@ -185,7 +187,7 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 
     /* Used of callback function to avoid the usage of many resources from the AppSerial */
     /* This line performs a send to queue the receive data */
-    AppSerial_Callback_CanRx2Queue((uint8_t*)&Rx_Data, mcmcan_node0.Rx_Message.messageId);
+    ptr_AppSerial_Callback_CanRx2Queue((uint8_t*)&Rx_Data, mcmcan_node0.Rx_Message.messageId);
 }
 
 /*----------------------------------------------------------------------------*/
