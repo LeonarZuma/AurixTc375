@@ -3,7 +3,6 @@
 /*----------------------------------------------------------------------------*/
 #include "stdint.h"
 #include "bsp.h"
-
 #include "Can_Driver.h"
 
 /*----------------------------------------------------------------------------*/
@@ -201,7 +200,7 @@ static Can_Txmsg_Config Can_HashTable(uint16_t id)
 
     for(uint8_t index = 0; index < CAN_TX_MESSAGES && !flag; index++)
     {
-        if(txmessages_cfg[index].txmessage_idx == id)
+        if(id == txmessages_cfg[index].txmessage_idx)
         {
             local_value.txmessage_idx = txmessages_cfg[index].txmessage_idx;
             local_value.Can_Node = txmessages_cfg[index].Can_Node;

@@ -1,8 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
+#include "stdint.h"
+
 #include "AppClock.h"
-#include "bsp.h"
 #include "RTCC.h"
 #include "Can_Driver.h"
 
@@ -93,7 +94,7 @@ static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
         switch (current_state)
         {
             case CLOCK_IDLE:
-                if(queue_content.size > 0)
+                if(0 < queue_content.size)
                 {
                     queue_content.size --;
                     /* detach an elemnt from the queue to place process it */

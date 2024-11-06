@@ -25,7 +25,7 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 #include <stdint.h>
-#include "Ifx_Types.h"
+// #include "Ifx_Types.h"
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 #include "IfxPort.h"

@@ -2,6 +2,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
+#include "stdint.h"
+#include "IfxCan_Can.h"
+
 #include "AppSerial.h"
 #include "Can_Driver.h"
 #include "bsp.h"
@@ -225,7 +228,7 @@ static void Serial_State_Machine(void)
             case IDLE:
                 /* check the queue if there is a message already available */
                 message_in_queue = AppQueue_isQueueEmpty(&can2ssm_queue);
-                if( message_in_queue == FALSE)
+                if(FALSE == message_in_queue)
                 {
                     current_state = MESSAGE;
                     AppQueue_readDataIsr(&can2ssm_queue, &data2Read);
@@ -259,7 +262,7 @@ static void Serial_State_Machine(void)
                 Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_111_PDU_BYTES);
 
                 /* check if the receive time in payload is valid */
-                if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]) == TRUE)
+                if (TRUE == Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]))
                 {
                     /* Build the message to queue for the RTCC of type TIME */
                     data2Write.tm.tm_hour = data2Read.sdu[HR];
@@ -283,7 +286,7 @@ static void Serial_State_Machine(void)
 
                 /* check if the receive date is a valid one */
                 valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
-                if (valid_date == TRUE)
+                if (TRUE == valid_date)
                 {
                     /* Change state to OK */
                     current_state = OK;
@@ -306,7 +309,7 @@ static void Serial_State_Machine(void)
                 Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_113_PDU_BYTES);
 
                 /* check if the alarm set time is a valid value */
-                if (Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0) == TRUE)
+                if (TRUE == Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0))
                 {
                     /* Build the message to queue for the RTCC of type ALARM */
                     data2Write.tm.tm_hour = data2Read.sdu[HR];
@@ -355,5 +358,5 @@ static void Serial_State_Machine(void)
                 break;
         }
         /* this while loop check two things if there are already available messages and if so complete the whole loop (IDLE->MESSAGE->)*/
-    }while((message_in_queue == FALSE) || (current_state != IDLE));
+    }while((FALSE == message_in_queue) || (IDLE != current_state));
 }
