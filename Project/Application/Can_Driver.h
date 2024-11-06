@@ -1,5 +1,5 @@
-#ifndef CAN_H_
-#define CAN_H_
+#ifndef CAN_DRIVER_H_
+#define CAN_DRIVER_H_
 
 /*----------------------------------------------------------------------------*/
 /*                                  Includes                                  */
