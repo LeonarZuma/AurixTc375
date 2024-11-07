@@ -4,6 +4,9 @@
         "scheduler.h": "c",
         "appserial.h": "c",
         "bsp.h": "c",
-        "app_bsp.h": "c"
+        "app_bsp.h": "c",
+        "ifxscuwdt.h": "c",
+        "ifxport_io.h": "c",
+        "queue.h": "c"
     }
 }
