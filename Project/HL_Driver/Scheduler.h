@@ -104,10 +104,6 @@ uint8_t AppSched_startTimer( AppSched_Scheduler *scheduler, uint8_t timer );
 
 uint8_t AppSched_stopTimer( AppSched_Scheduler *scheduler, uint8_t timer );
 
-void AppSched_Callback_Tickflag_Core0(void);
-
-void AppSched_Callback_Tickflag_Core1(void);
-
-void AppSched_Callback_Tickflag_Core2(void);
+void AppSched_Callback_Tickflag_Stm(uint8_t stm);
 
 #endif
