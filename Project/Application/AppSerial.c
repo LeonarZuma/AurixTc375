@@ -45,7 +45,7 @@ static uint8_t Serial_BCD2Decimal(uint8_t data);
 
 static void Serial_CanRxData_BCD2Decimal(uint8_t *data, uint8_t size);
 
-static void Serial_State_Machine(void);
+static void Serial_State_Machine(App_Pdu *data2Read_ptr);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -61,8 +61,14 @@ void AppSerial_initTask( void )
 
 void AppSerial_periodicTask( void )
 {
-    
-    Serial_State_Machine();
+    App_Pdu data2Read;
+    while (FALSE == AppQueue_isQueueEmpty(&can2ssm_queue))
+    {
+        /* read a value from the queue and process it */
+        AppQueue_readDataIsr(&can2ssm_queue, &data2Read);
+        /* Exceute the state machine */
+        Serial_State_Machine(&data2Read);
+    }
     
 }
 
@@ -195,19 +201,13 @@ static void Serial_CanRxData_BCD2Decimal(uint8_t *data, uint8_t size)
     }
 }
 
-static void Serial_State_Machine(void)
+static void Serial_State_Machine(App_Pdu *data2Read_ptr)
 {
     /* create a queue message container to write for the rtcc queue */
     App_Message data2Write;
 
     /* create a queue message container */
-    App_Pdu data2Read;
-
-    /* define the init SSM state */
-    SSM_States current_state = IDLE;
-
-    /* to check the queue current state */
-    uint8_t message_in_queue = FALSE;
+    App_Pdu data2Write_serial;
 
     /* to convert 2 bytes array to a single 16 bits value */
     uint16_t year = 0;
@@ -218,147 +218,112 @@ static void Serial_State_Machine(void)
     /* Can data transmission */
     uint8_t can_datatx[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-    /* create a queue message container for the Tx queue that is sharing the message time configurationn */
-    
-    /* if data in queue, keep reading until queue buffer is empty */
-    do
+    /* execute the complete state machine from begining to end for every message in buffer */
+    /* switch case */
+    switch (data2Read_ptr->pci)
     {
-        /* execute the complete state machine from begining to end for every message in buffer */
-        /* switch case */
-        switch (current_state)
-        {
-            case IDLE:
-                /* check the queue if there is a message already available */
-                message_in_queue = AppQueue_isQueueEmpty(&can2ssm_queue);
-                if(FALSE == message_in_queue)
-                {
-                    current_state = MESSAGE;
-                    AppQueue_readDataIsr(&can2ssm_queue, &data2Read);
-                }
-                else
-                {
-                    /* the state reamains as IDLE and we reach the end of loop */
-                }
+        case TIME:
+            /* Perform conversion from BCD type to Decimal for the income data */
+            Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read_ptr->sdu, ID_111_PDU_BYTES);
 
-                break;
-            case MESSAGE:
-                /* Check if the receive message is valid */
-                switch (data2Read.pci)
-                {
-                    case CANRX_TIME_MSG_ID:
-                        current_state = TIME;
-                        break;
-                    case CANRX_DATE_MSG_ID:
-                        current_state = DATE;
-                        break;
-                    case CANRX_ALARM_MSG_ID:
-                        current_state = ALARM;
-                        break;
-                    default:
-                        current_state = ERROR;
-                        break;
-                }
-                break;
-            case TIME:
-                /* Perform conversion from BCD type to Decimal for the income data */
-                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_111_PDU_BYTES);
+            /* check if the receive time in payload is valid */
+            if (TRUE == Serial_validateTime(data2Read_ptr->sdu[HR],data2Read_ptr->sdu[MIN],data2Read_ptr->sdu[SEC]))
+            {
+                /* Build the message to queue for the RTCC of type TIME */
+                data2Write.tm.tm_hour = data2Read_ptr->sdu[HR];
+                data2Write.tm.tm_min = data2Read_ptr->sdu[MIN];
+                data2Write.tm.tm_sec = data2Read_ptr->sdu[SEC];
+                data2Write.msg = SERIAL_MSG_TIME;
 
-                /* check if the receive time in payload is valid */
-                if (TRUE == Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN],data2Read.sdu[SEC]))
-                {
-                    /* Build the message to queue for the RTCC of type TIME */
-                    data2Write.tm.tm_hour = data2Read.sdu[HR];
-                    data2Write.tm.tm_min = data2Read.sdu[MIN];
-                    data2Write.tm.tm_sec = data2Read.sdu[SEC];
-                    data2Write.msg = SERIAL_MSG_TIME;
+                /* Change state to OK */
+                data2Write_serial.pci = OK;
+            }
+            else
+            {
+                /* no valid time, change to ERROR state */
+                data2Write_serial.pci = ERROR;
+            }
 
-                    /* Change state to OK */
-                    current_state = OK;
-                }
-                else
-                {
-                    /* no valid time, change to ERROR state */
-                    current_state = ERROR;
-                }
-                break;
-            case DATE:
-                /* Perform conversion from BCD type to Decimal for the income data */  
-                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_112_PDU_BYTES);
-                year = ((data2Read.sdu[YR1] * 100) + (data2Read.sdu[YR0]));
+            AppQueue_writeDataMutex(&can2ssm_queue, &data2Write_serial, MUTEX_uS_WAIT);
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
+        case DATE:
+            /* Perform conversion from BCD type to Decimal for the income data */  
+            Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read_ptr->sdu, ID_112_PDU_BYTES);
+            year = ((data2Read_ptr->sdu[YR1] * 100) + (data2Read_ptr->sdu[YR0]));
 
-                /* check if the receive date is a valid one */
-                valid_date = Serial_validateDate(data2Read.sdu[DAY], data2Read.sdu[MO], year);
-                if (TRUE == valid_date)
-                {
-                    /* Change state to OK */
-                    current_state = OK;
+            /* check if the receive date is a valid one */
+            valid_date = Serial_validateDate(data2Read_ptr->sdu[DAY], data2Read_ptr->sdu[MO], year);
+            if (TRUE == valid_date)
+            {
+                /* Change state to OK */
+                data2Write_serial.pci = OK;
 
-                    /* Build the message to queue for the RTCC of type TIME */
-                    data2Write.tm.tm_mday = data2Read.sdu[DAY];
-                    data2Write.tm.tm_mon = data2Read.sdu[MO];
-                    data2Write.tm.tm_year = year;
-                    data2Write.msg = SERIAL_MSG_DATE;
-                }
-                else
-                {
-                    /* no valid time, change to ERROR state */
-                    current_state = ERROR;
-                }
-                break;
+                /* Build the message to queue for the RTCC of type TIME */
+                data2Write.tm.tm_mday = data2Read_ptr->sdu[DAY];
+                data2Write.tm.tm_mon = data2Read_ptr->sdu[MO];
+                data2Write.tm.tm_year = year;
+                data2Write.msg = SERIAL_MSG_DATE;
+            }
+            else
+            {
+                /* no valid time, change to ERROR state */
+                data2Write_serial.pci = ERROR;
+            }
 
-            case ALARM:
-                /* Perform conversion from BCD type to Decimal for the income data */
-                Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read.sdu, ID_113_PDU_BYTES);
+            AppQueue_writeDataMutex(&can2ssm_queue, &data2Write_serial, MUTEX_uS_WAIT);
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
 
-                /* check if the alarm set time is a valid value */
-                if (TRUE == Serial_validateTime(data2Read.sdu[HR],data2Read.sdu[MIN], 0))
-                {
-                    /* Build the message to queue for the RTCC of type ALARM */
-                    data2Write.tm.tm_hour = data2Read.sdu[HR];
-                    data2Write.tm.tm_min = data2Read.sdu[MIN];
-                    data2Write.msg = SERIAL_MSG_ALARM;
+        case ALARM:
+            /* Perform conversion from BCD type to Decimal for the income data */
+            Serial_CanRxData_BCD2Decimal((uint8_t *)&data2Read_ptr->sdu, ID_113_PDU_BYTES);
 
-                    /* Change state to OK */
-                    current_state = OK;
-                }
-                else
-                {
-                    /* no valid time, change to ERROR state */
-                    current_state = ERROR;
-                }
-                break;
-            case ERROR:
+            /* check if the alarm set time is a valid value */
+            if (TRUE == Serial_validateTime(data2Read_ptr->sdu[HR],data2Read_ptr->sdu[MIN], 0))
+            {
+                /* Build the message to queue for the RTCC of type ALARM */
+                data2Write.tm.tm_hour = data2Read_ptr->sdu[HR];
+                data2Write.tm.tm_min = data2Read_ptr->sdu[MIN];
+                data2Write.msg = SERIAL_MSG_ALARM;
 
-                /* We go back to the first state after the machine logic has been complete */
-                current_state = IDLE;
-                /* Packing bytes to send via CAN*/
-                can_datatx[0] = 0xAA;
-                Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
+                /* Change state to OK */
+                data2Write_serial.pci = OK;
+            }
+            else
+            {
+                /* no valid time, change to ERROR state */
+                data2Write_serial.pci = ERROR;
+            }
 
-                /* Send NOK message via CAN */
-                Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
+            AppQueue_writeDataMutex(&can2ssm_queue, &data2Write_serial, MUTEX_uS_WAIT);
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
 
-                break;
+        case ERROR:        
+            /* Packing bytes to send via CAN*/
+            can_datatx[0] = 0xAA;
+            Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
-            case OK:
-                /* We go back to the first state after the machine logic has been complete */
-                current_state = IDLE;
-                
-                /* Send the message from SSM To RTCC queue */
-                AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
-                
-                /* Packing bytes to send via CAN*/
-                can_datatx[0] = 0x55;
-                Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
+            /* Send NOK message via CAN */
+            Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
 
-                /* Send OK message via CAN */
-                Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
+            break;
 
-                break;
+        case OK:                        
+            /* Packing bytes to send via CAN*/
+            can_datatx[0] = 0x55;
+            Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
-            default:
-                break;
-        }
-        /* this while loop check two things if there are already available messages and if so complete the whole loop (IDLE->MESSAGE->)*/
-    }while((FALSE == message_in_queue) || (IDLE != current_state));
+            /* Send OK message via CAN */
+            Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
+
+            break;
+
+        default:
+            break;
+    }
 }
