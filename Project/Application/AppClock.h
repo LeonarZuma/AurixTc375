@@ -25,9 +25,7 @@
 
 typedef enum
 {
-    CLOCK_IDLE = 0,
-    CLOCK_MESSAGE,
-    CNFG_TIME,
+    CNFG_TIME=1,
     CNFG_DATE,
     CNFG_ALARM,
     CLOCK_ERROR,

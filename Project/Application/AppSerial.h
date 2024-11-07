@@ -35,9 +35,7 @@ typedef struct _App_Pdu // Protocol Data Unit
 
 typedef enum
 {
-    IDLE = 0,
-    MESSAGE,
-    TIME,
+    TIME = 0x111,
     DATE,
     ALARM,
     ERROR,

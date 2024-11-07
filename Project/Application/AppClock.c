@@ -19,7 +19,7 @@ static AppRtcc_Rtcc RTCC_struct;
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
 
-static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content);
+static void AppClock_StateMachine(App_Message *data2Read_ptr);
 
 static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t *queue_content);
 
@@ -49,17 +49,17 @@ void AppClock_initTask( void )
 
 void AppClock_periodicTask( void )
 {
-    /* Create data struct type to contain the queue information */
-    appclock_ssm2rtcc_data_t ssm2rtcc_queue_content = {
-        .size = 0,
-        .state = FALSE
-    };
 
-    /* Read all the queue elements from the ss2rtcc */
-    AppClock_ReadAllQueue(&ssm2rtcc_queue_content);
+    App_Message data2Read;
 
-    /* Execute state machine with the elements of the queue that has been read */
-    AppClock_StateMachine(ssm2rtcc_queue_content);
+    while (FALSE == AppQueue_isQueueEmpty(&ssm2rtcc_queue))
+    {
+        /* read a value from the queue and process it */
+        AppQueue_readDataIsr(&ssm2rtcc_queue, &data2Read);
+        /* Execute state machine with the elements of the queue that has been read */
+        AppClock_StateMachine(&data2Read);
+    }
+
 }
 
 void AppClock_RTCCUpdate_Callback()
@@ -81,92 +81,65 @@ void AppClock_RTCCUpdate_Callback()
 /*                         Implementation of local functions                  */
 /*----------------------------------------------------------------------------*/
 
-static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
+static void AppClock_StateMachine(App_Message *data2Read_ptr)
 {
     /* create a queue message container to write for the rtcc queue */
-    App_Message data2Read;
-    
-    /* define the init CSM state */
-    CSM_states current_state = CLOCK_IDLE;
+    App_Message data2Write;
 
-    do
+    switch (data2Read_ptr->msg)
     {
-        switch (current_state)
-        {
-            case CLOCK_IDLE:
-                if(0 < queue_content.size)
-                {
-                    queue_content.size --;
-                    /* detach an elemnt from the queue to place process it */
-                    data2Read = queue_content.data[queue_content.size];
-                    /* Assign the current receive message type to change CSM current state */
-                    current_state = CLOCK_MESSAGE;
-                }
-                else
-                {
-                    /* do nothing the current state is keep */
-                }
-                break;
-            case CLOCK_MESSAGE:
-                /* perform message filtering */
-                switch(data2Read.msg)
-                {
-                    case SERIAL_MSG_TIME:
-                        current_state = CNFG_TIME;
-                        break;
-                    case SERIAL_MSG_DATE:
-                        current_state = CNFG_DATE;
-                        break;
-                    case SERIAL_MSG_ALARM:
-                        current_state = CNFG_ALARM;
-                        break;
-                    default:
-                        current_state = CLOCK_IDLE;
-                        break;
-                }
-                break;
-            case CNFG_TIME:
-                if (TRUE == AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec))
-                {
-                    current_state = CLOCK_OK;
-                }
-                else
-                {
-                    current_state = CLOCK_ERROR;
-                }
-                break;
-            case CNFG_DATE:
-                if (TRUE == AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year))
-                {
-                    current_state = CLOCK_OK;
-                }
-                else
-                {
-                    current_state = CLOCK_ERROR;
-                }
-                break;
-            case CNFG_ALARM:
-                if (TRUE == AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min))
-                {
-                    current_state = CLOCK_OK;
-                }
-                else
-                {
-                    current_state = CLOCK_ERROR;
-                }
-                break;
-            case CLOCK_ERROR:
-                /* retry the set operation */
-                /* avoiding the read of a new value from the queue */
-                current_state = CLOCK_MESSAGE;
-                break;
-            case CLOCK_OK:
-                current_state = CLOCK_IDLE;
-                break;
-            default:
-                break;
-        }
-    } while (current_state != CLOCK_IDLE || queue_content.size > 0);
+        case SERIAL_MSG_TIME:
+            if (TRUE == AppRtcc_setTime(&RTCC_struct, data2Read_ptr->tm.tm_hour, data2Read_ptr->tm.tm_min, data2Read_ptr->tm.tm_sec))
+            {
+                data2Write.msg = CLOCK_OK;
+            }
+            else
+            {
+                data2Write.msg = CLOCK_ERROR;
+            }
+
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
+        case SERIAL_MSG_DATE:
+            if (TRUE == AppRtcc_setDate(&RTCC_struct, data2Read_ptr->tm.tm_mday, data2Read_ptr->tm.tm_mon, data2Read_ptr->tm.tm_year))
+            {
+                data2Write.msg = CLOCK_OK;
+            }
+            else
+            {
+                data2Write.msg = CLOCK_ERROR;
+            }
+
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
+        case SERIAL_MSG_ALARM:
+            if (TRUE == AppRtcc_setAlarm(&RTCC_struct, data2Read_ptr->tm.tm_hour, data2Read_ptr->tm.tm_min))
+            {
+                data2Write.msg = CLOCK_OK;
+            }
+            else
+            {
+                data2Write.msg = CLOCK_ERROR;
+            }
+
+            /* Send the message from SSM To RTCC queue */
+            AppQueue_writeDataMutex(&ssm2rtcc_queue, &data2Write, MUTEX_uS_WAIT);
+            break;
+
+        case CLOCK_ERROR:
+            /* retry the set operation */
+            /* avoiding the read of a new value from the queue */
+            break;
+
+        case CLOCK_OK:
+            /* To do, lets see if we need to implement something */
+            break;
+            
+        default:
+            break;
+    }
 }
 
 static void AppClock_ReadAllQueue(appclock_ssm2rtcc_data_t *queue_content)
