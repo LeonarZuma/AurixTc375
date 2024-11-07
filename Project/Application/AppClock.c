@@ -126,15 +126,41 @@ static void AppClock_StateMachine(appclock_ssm2rtcc_data_t queue_content)
                 }
                 break;
             case CNFG_TIME:
-                AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec);
-                current_state = CLOCK_IDLE;
+                if (TRUE == AppRtcc_setTime(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min, data2Read.tm.tm_sec))
+                {
+                    current_state = CLOCK_OK;
+                }
+                else
+                {
+                    current_state = CLOCK_ERROR;
+                }
                 break;
             case CNFG_DATE:
-                AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year);
-                current_state = CLOCK_IDLE;
+                if (TRUE == AppRtcc_setDate(&RTCC_struct, data2Read.tm.tm_mday, data2Read.tm.tm_mon, data2Read.tm.tm_year))
+                {
+                    current_state = CLOCK_OK;
+                }
+                else
+                {
+                    current_state = CLOCK_ERROR;
+                }
                 break;
             case CNFG_ALARM:
-                AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min);
+                if (TRUE == AppRtcc_setAlarm(&RTCC_struct, data2Read.tm.tm_hour, data2Read.tm.tm_min))
+                {
+                    current_state = CLOCK_OK;
+                }
+                else
+                {
+                    current_state = CLOCK_ERROR;
+                }
+                break;
+            case CLOCK_ERROR:
+                /* retry the set operation */
+                /* avoiding the read of a new value from the queue */
+                current_state = CLOCK_MESSAGE;
+                break;
+            case CLOCK_OK:
                 current_state = CLOCK_IDLE;
                 break;
             default:
@@ -166,7 +192,7 @@ static void AppClock_CanTx_DateTime(App_TmTime *data)
     CanTp_SingleFrameTx(datatx, CANTX_TIME_PDU_BYTES);
 
     /* Send time over CAN */
-    Can_Send_Message((uint16_t)CANTX_TIME_MSG_ID, (uint8_t *)&datatx);
+    Can_Retry_Send_Message((uint16_t)CANTX_TIME_MSG_ID, (uint8_t *)&datatx, CAN_SEND_ATTEMPS);
 
     datatx[0] = AppClock_Can_Decimal2BCD(data->tm_mday);
     datatx[1] = AppClock_Can_Decimal2BCD(data->tm_mon);

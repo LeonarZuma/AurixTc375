@@ -336,7 +336,7 @@ static void Serial_State_Machine(void)
                 Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send NOK message via CAN */
-                Can_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ]);
+                Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
 
                 break;
 
@@ -352,7 +352,7 @@ static void Serial_State_Machine(void)
                 Serial_singleFrameTx((uint8_t *)&can_datatx, 1);
 
                 /* Send OK message via CAN */
-                Can_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ]);
+                Can_Retry_Send_Message((uint16_t)CANTX_STATUS_MSG_ID, (uint8_t*)&can_datatx[ 0u ], CAN_SEND_ATTEMPS);
 
                 break;
 

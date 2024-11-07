@@ -157,14 +157,42 @@ void CAN_Init_AppSerial(void)
     IfxCan_Can_setStandardFilter( &mcmcan_node0.Can_Node, &mcmcan_node0.Can_Dst_Filter );
 }
 
-void Can_Send_Message(uint16_t txmessage_idx, uint8_t *data)
+uint8_t Can_Send_Message(uint16_t txmessage_idx, uint8_t *data)
 {
+    uint8_t succes_event = FALSE;
     /* container to save the matching value from the hash table */
     can_txmsg_config_t local_value;
     /* look using the hash table the corresponding data structure for a given message id */
     local_value = Can_HashTable(txmessage_idx);
 
-    IfxCan_Can_sendMessage( local_value.Can_Node, local_value.Tx_Message, (uint32*)&data[ 0u ] );
+    if (TRUE == IfxCan_Can_sendMessage( local_value.Can_Node, local_value.Tx_Message, (uint32*)&data[ 0u ] ))
+    {
+        succes_event = TRUE;
+    }
+    else
+    {
+        /* the message hasnt been send return the FALSE state to retry */
+    }
+    return succes_event;
+}
+
+uint8_t Can_Retry_Send_Message(uint16_t txmessage_idx, uint8_t *data, uint8_t attemps)
+{
+    uint8_t succes_event = FALSE;
+
+    while (attemps-->0)
+    {
+        if(TRUE == Can_Send_Message(txmessage_idx, data))
+        {
+            succes_event = TRUE;
+        }
+        else
+        {
+            /* if the retry attemps hasn't been reach try a new loop */
+        }
+    }
+    
+    return succes_event;
 }
 
 uint8_t AppClock_Can_Decimal2BCD (uint8_t data)
