@@ -37,13 +37,9 @@
 #define FALSE   0U
 
 /* Definition of pointers for Callback functions */
-callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core0 = AppSched_Callback_Tickflag_Core0;
-callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core1 = AppSched_Callback_Tickflag_Core1;
-callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core2 = AppSched_Callback_Tickflag_Core2;
+callback_stm_func_t ptr_AppSched_Callback_Tickflag_Stm = AppSched_Callback_Tickflag_Stm;
 
-static AppSched_Scheduler *intScheduler0 = NULL;
-static AppSched_Scheduler *intScheduler1 = NULL;
-static AppSched_Scheduler *intScheduler2 = NULL;
+static uint8_t *tickflags_stm[] = {NULL, NULL, NULL};
 
 #if (SCHD_INT_MODE)
 /**
@@ -181,23 +177,8 @@ void AppSched_initScheduler(AppSched_Scheduler *scheduler)
     scheduler->tasksCount = 0;
     scheduler->timerCount = 0;
 
-    switch (scheduler->stm)
-    {
-        case 0:
-            intScheduler0 = scheduler;
-            Init_Stm(scheduler->stm, scheduler->tick);
-            break;
-        case 1:
-            intScheduler1 = scheduler;
-            Init_Stm(scheduler->stm, scheduler->tick);
-            break;
-        case 2:
-            intScheduler2 = scheduler;
-            Init_Stm(scheduler->stm, scheduler->tick);
-            break;
-        default:
-            break;
-    }
+    tickflags_stm[scheduler->stm] = &scheduler->tickFlag;
+    Init_Stm(scheduler->stm, scheduler->tick);
 
 }
 
@@ -572,17 +553,7 @@ uint8_t AppSched_stopTimer(AppSched_Scheduler *scheduler, uint8_t timer)
 
 /* Create callback functions to set the flag when the isr is been called */
 
-void AppSched_Callback_Tickflag_Core0(void)
+void AppSched_Callback_Tickflag_Stm(uint8_t stm)
 {
-    intScheduler0->tickFlag = TRUE;
-}
-
-void AppSched_Callback_Tickflag_Core1(void)
-{
-    intScheduler0->tickFlag = TRUE;
-}
-
-void AppSched_Callback_Tickflag_Core2(void)
-{
-    intScheduler0->tickFlag = TRUE;
+    *tickflags_stm[stm] = TRUE;
 }

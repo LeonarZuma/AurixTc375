@@ -9,13 +9,7 @@
 /*                               Local defines                                */
 /*----------------------------------------------------------------------------*/
 /* typedef for a better comprehension*/
-typedef void (*callback_stm_func_t) (void);
-
-/* typedef for a better comprehension*/
-typedef void (*callback_stm_func_t) (void);
-
-/* typedef for a better comprehension*/
-typedef void (*callback_stm_func_t) (void);
+typedef void (*callback_stm_func_t) (uint8_t);
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
@@ -41,6 +35,6 @@ typedef void (*callback_stm_func_t) (void);
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
-void Init_Stm(uint8_t core, uint32_t scheduler_tick);
+void Init_Stm(uint8_t stm, uint32_t scheduler_tick);
 
 #endif
