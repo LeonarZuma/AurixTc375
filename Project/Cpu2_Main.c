@@ -71,7 +71,6 @@ void core2_main(void)
     Sche_core2.taskPtr = tasks;
 	Sche_core2.timers = N_TIMERS;
     Sche_core2.timerPtr = timers;
-    Sche_core2.moduleStm = &MODULE_STM2;
     Sche_core2.stm = STM2;
     
 

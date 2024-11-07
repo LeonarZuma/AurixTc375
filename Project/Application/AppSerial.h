@@ -29,8 +29,8 @@
 /*----------------------------------------------------------------------------*/
 typedef struct _App_Pdu // Protocol Data Unit
 {
-    uint32 pci;     // Protocol Control Information
-    uint8  sdu[8];  // Service Data Unit
+    uint32_t pci;     // Protocol Control Information
+    uint8_t  sdu[8];  // Service Data Unit
 } App_Pdu;
 
 typedef enum

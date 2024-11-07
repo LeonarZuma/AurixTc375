@@ -29,10 +29,10 @@ typedef struct
     uint16_t txmessage_idx;
     IfxCan_Can_Node* Can_Node;
     IfxCan_Message* Tx_Message;
-} Can_Txmsg_Config;
+} can_txmsg_config_t;
 
 /* typedef for a better comprehension*/
-typedef void (*callback_func_t) (uint8_t *datarx, uint16_t message_id);
+typedef void (*callback_can_func_t) (uint8_t *datarx, uint16_t message_id);
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */

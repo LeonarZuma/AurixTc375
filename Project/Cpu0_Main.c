@@ -80,7 +80,6 @@ void core0_main(void)
     Sche_core0.taskPtr = tasks;
 	Sche_core0.timers = N_TIMERS;
     Sche_core0.timerPtr = timers;
-    Sche_core0.moduleStm = &MODULE_STM0;
     Sche_core0.stm = STM0;
 
     AppSched_initScheduler(&Sche_core0);

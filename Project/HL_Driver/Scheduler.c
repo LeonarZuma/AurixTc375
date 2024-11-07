@@ -23,9 +23,9 @@
  * @note    the maximum counting timeout posible is 2^32 
  */
 #include <stdint.h>
-#include "Ifx_Types.h"
-#include "IfxStm.h"
+#include <stddef.h>
 #include "Scheduler.h"
+#include "Stm_Driver.h"
 
 #ifdef TESSY
 
@@ -33,10 +33,13 @@
 
 #endif
 
-/*Global variable to configure the STM0 Cmp0*/
-static IfxStm_CompareConfig Stm_Cmp_Config0;
-static IfxStm_CompareConfig Stm_Cmp_Config1;
-static IfxStm_CompareConfig Stm_Cmp_Config2;
+#define TRUE    1U
+#define FALSE   0U
+
+/* Definition of pointers for Callback functions */
+callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core0 = AppSched_Callback_Tickflag_Core0;
+callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core1 = AppSched_Callback_Tickflag_Core1;
+callback_stm_func_t ptr_AppSched_Callback_Tickflag_Core2 = AppSched_Callback_Tickflag_Core2;
 
 static AppSched_Scheduler *intScheduler0 = NULL;
 static AppSched_Scheduler *intScheduler1 = NULL;
@@ -182,39 +185,15 @@ void AppSched_initScheduler(AppSched_Scheduler *scheduler)
     {
         case 0:
             intScheduler0 = scheduler;
-            IfxStm_initCompareConfig( &Stm_Cmp_Config0 );
-            Stm_Cmp_Config0.ticks = scheduler->tick;
-            Stm_Cmp_Config0.comparator = IfxStm_Comparator_0;
-            Stm_Cmp_Config0.comparatorInterrupt = IfxStm_ComparatorInterrupt_ir0;
-            Stm_Cmp_Config0.triggerPriority = IFX_INTPRIO_STM0_CMP0;
-            Stm_Cmp_Config0.typeOfService = IfxSrc_Tos_cpu0;
-            /*Configure the comparator to se for 500ms and enable its corresponding interrupt
-            * using its corresponding Service Request Node (SRN) */
-            IfxStm_initCompare( scheduler->moduleStm, &Stm_Cmp_Config0 );
+            Init_Stm(scheduler->stm, scheduler->tick);
             break;
         case 1:
             intScheduler1 = scheduler;
-            IfxStm_initCompareConfig( &Stm_Cmp_Config1 );
-            Stm_Cmp_Config1.ticks = scheduler->tick;
-            Stm_Cmp_Config1.comparator = IfxStm_Comparator_0;
-            Stm_Cmp_Config1.comparatorInterrupt = IfxStm_ComparatorInterrupt_ir0;
-            Stm_Cmp_Config1.triggerPriority = IFX_INTPRIO_STM0_CMP0;
-            Stm_Cmp_Config1.typeOfService = IfxSrc_Tos_cpu1;
-            /*Configure the comparator to se for 500ms and enable its corresponding interrupt
-            * using its corresponding Service Request Node (SRN) */
-            IfxStm_initCompare( scheduler->moduleStm, &Stm_Cmp_Config1 );
+            Init_Stm(scheduler->stm, scheduler->tick);
             break;
         case 2:
             intScheduler2 = scheduler;
-            IfxStm_initCompareConfig( &Stm_Cmp_Config2 );
-            Stm_Cmp_Config2.ticks = scheduler->tick;
-            Stm_Cmp_Config2.comparator = IfxStm_Comparator_0;
-            Stm_Cmp_Config2.comparatorInterrupt = IfxStm_ComparatorInterrupt_ir0;
-            Stm_Cmp_Config2.triggerPriority = IFX_INTPRIO_STM0_CMP0;
-            Stm_Cmp_Config2.typeOfService = IfxSrc_Tos_cpu2;
-            /*Configure the comparator to se for 500ms and enable its corresponding interrupt
-            * using its corresponding Service Request Node (SRN) */
-            IfxStm_initCompare( scheduler->moduleStm, &Stm_Cmp_Config2 );
+            Init_Stm(scheduler->stm, scheduler->tick);
             break;
         default:
             break;
@@ -591,35 +570,19 @@ uint8_t AppSched_stopTimer(AppSched_Scheduler *scheduler, uint8_t timer)
     return succStop;
 }
 
-IFX_INTERRUPT( Isr_Stm0_Cmp0, 0, IFX_INTPRIO_STM0_CMP0)
+/* Create callback functions to set the flag when the isr is been called */
+
+void AppSched_Callback_Tickflag_Core0(void)
 {
-    /*we do something set tick flag */
     intScheduler0->tickFlag = TRUE;
-    /*it is neccesary to clear the module (STM0 CMP0) interrupt flag*/
-    IfxStm_clearCompareFlag( intScheduler0->moduleStm, Stm_Cmp_Config0.comparator );
-    /* reload the comparator with the last value plus the same amount of ticks to keep
-    * setting the comparator flag at the same frequency */
-    IfxStm_increaseCompare( intScheduler0->moduleStm, Stm_Cmp_Config0.comparator, Stm_Cmp_Config0.ticks );
 }
 
-IFX_INTERRUPT( Isr_Stm1_Cmp0, 1, IFX_INTPRIO_STM0_CMP0)
+void AppSched_Callback_Tickflag_Core1(void)
 {
-    /*we do something set tick flag */
-    intScheduler1->tickFlag = TRUE;
-    /*it is neccesary to clear the module (STM0 CMP0) interrupt flag*/
-    IfxStm_clearCompareFlag( intScheduler1->moduleStm, Stm_Cmp_Config1.comparator );
-    /* reload the comparator with the last value plus the same amount of ticks to keep
-    * setting the comparator flag at the same frequency */
-    IfxStm_increaseCompare( intScheduler1->moduleStm, Stm_Cmp_Config1.comparator, Stm_Cmp_Config1.ticks );
+    intScheduler0->tickFlag = TRUE;
 }
 
-IFX_INTERRUPT( Isr_Stm2_Cmp0, 2, IFX_INTPRIO_STM0_CMP0)
+void AppSched_Callback_Tickflag_Core2(void)
 {
-    /*we do something set tick flag */
-    intScheduler2->tickFlag = TRUE;
-    /*it is neccesary to clear the module (STM0 CMP0) interrupt flag*/
-    IfxStm_clearCompareFlag( intScheduler2->moduleStm, Stm_Cmp_Config2.comparator );
-    /* reload the comparator with the last value plus the same amount of ticks to keep
-    * setting the comparator flag at the same frequency */
-    IfxStm_increaseCompare( intScheduler2->moduleStm, Stm_Cmp_Config2.comparator, Stm_Cmp_Config2.ticks );
+    intScheduler0->tickFlag = TRUE;
 }
