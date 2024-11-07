@@ -30,8 +30,8 @@ typedef enum
     CNFG_TIME,
     CNFG_DATE,
     CNFG_ALARM,
-    SENT_TIME,
-    SENT_DATE
+    CLOCK_ERROR,
+    CLOCK_OK,
 } CSM_states;
 
 typedef struct

@@ -19,7 +19,8 @@
 #define ID_113_PDU_BYTES        (2)
 /* CAN defines */
 #define ISR_PRIORITY_CAN_RX     (1)
-#define CAN_TX_MESSAGES     (3U)
+#define CAN_TX_MESSAGES         (3U)
+#define CAN_SEND_ATTEMPS        (2U)
 
 /*----------------------------------------------------------------------------*/
 /*                              Local data types                              */
