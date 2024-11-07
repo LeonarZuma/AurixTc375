@@ -3,7 +3,6 @@
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
 #include "stdint.h"
-#include "IfxCan_Can.h"
 #include "Phase1.h"
 #include "AppSerial.h"
 #include "Can_Driver.h"
@@ -21,7 +20,7 @@ App_Pdu buffer_can2ssm[QUEUE_BUFFER_SIZE];
 App_Message buffer_ssm2rtcc[QUEUE_BUFFER_SIZE];
 
 /* Callback function registration */
-callback_func_t ptr_AppSerial_Callback_CanRx2Queue = AppSerial_Callback_CanRx2Queue;
+callback_can_func_t ptr_AppSerial_Callback_CanRx2Queue = AppSerial_Callback_CanRx2Queue;
 
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */

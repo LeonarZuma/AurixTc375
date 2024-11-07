@@ -3,14 +3,14 @@ TARGET = Test
 # Application source files to compile
 SRCS  = Cpu0_Main.c Cpu1_Main.c Cpu2_Main.c Bsp.c Assert.c sync_on_halt.c
 SRCS += Buffer.c Queue.c Scheduler.c Phase1.c RTCC.c
-SRCS += AppSerial.c AppClock.c Can_Driver.c
+SRCS += AppSerial.c AppClock.c Can_Driver.c Stm_Driver.c
 SRCS += CompilerGcc.c CompilerDcc.c CompilerGhs.c CompilerGnuc.c CompilerTasking.c 
 SRCS += Ifx_Ssw_Infra.c Ifx_Ssw_Tc0.c Ifx_Ssw_Tc1.c Ifx_Ssw_Tc2.c Ifx_Cfg_Ssw.c Ifx_Cfg_SswBmhd.c
 SRCS += IfxPmsEvr.c IfxPmsPm.c IfxPms_PinMap.c
 SRCS += IfxScuCcu.c IfxScuEru.c IfxScuLbist.c IfxScuRcu.c IfxScuWdt.c IfxScu_PinMap.c IfxScu_cfg.c
 SRCS += IfxCpu.c IfxCpu_Irq.c IfxCpu_Trap.c IfxCpu_cfg.c
 SRCS += IfxPort.c IfxPort_Io.c IfxPort_PinMap.c IfxPort_cfg.c
-SRCS += IfxStm.c IfxStm_cfg.c IfxSrc.c
+SRCS += IfxStm.c IfxStm_cfg.c IfxSrc.c 
 SRCS += IfxCan_Can.c IfxCan.c IfxCan_PinMap.c IfxCan_cfg.c
 
 # Linker file

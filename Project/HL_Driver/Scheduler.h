@@ -27,7 +27,6 @@
 #define SCHEDULER_H_
 
 #include "stdint.h"
-#include "IfxStm_regdef.h"
 
 #define IFX_INTPRIO_STM0_CMP0    10
 
@@ -79,7 +78,6 @@ typedef struct _AppSched_Scheduler
     uint8_t timerCount;             /*!<internal timer counter>*/
     uint32_t msCount;               /*!<miliseconds Count>*/
     uint8_t tickFlag;               /*!<tickflag indicator>*/
-    Ifx_STM *moduleStm;             /*!<module stm pointer>*/
     uint8_t stm;                    /*!< module stm index >*/
 } AppSched_Scheduler;
 
@@ -106,6 +104,10 @@ uint8_t AppSched_startTimer( AppSched_Scheduler *scheduler, uint8_t timer );
 
 uint8_t AppSched_stopTimer( AppSched_Scheduler *scheduler, uint8_t timer );
 
+void AppSched_Callback_Tickflag_Core0(void);
 
+void AppSched_Callback_Tickflag_Core1(void);
+
+void AppSched_Callback_Tickflag_Core2(void);
 
 #endif

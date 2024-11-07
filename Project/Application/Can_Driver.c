@@ -13,7 +13,7 @@
 static mcmcanType mcmcan_node0;
 static mcmcanType mcmcan_node1;
 
-extern callback_func_t ptr_AppSerial_Callback_CanRx2Queue;
+extern callback_can_func_t ptr_AppSerial_Callback_CanRx2Queue;
 
 /*Define a structure that contains the pins to be configured as CAN pins*/
 static IFX_CONST IfxCan_Can_Pins Can_Pins_node1 =
@@ -25,7 +25,7 @@ static IFX_CONST IfxCan_Can_Pins Can_Pins_node1 =
     .padDriver  = IfxPort_PadDriver_cmosAutomotiveSpeed4
 };
 
-static Can_Txmsg_Config txmessages_cfg[]=
+static can_txmsg_config_t txmessages_cfg[]=
 {
     {0x122, &mcmcan_node0.Can_Node, &mcmcan_node0.Tx_Message[0]},
     {0x201, &mcmcan_node1.Can_Node, &mcmcan_node1.Tx_Message[0]},
@@ -44,7 +44,7 @@ IFX_CONST IfxCan_Can_Pins Can_Pins_node0 =
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
-static Can_Txmsg_Config Can_HashTable(uint16_t id);
+static can_txmsg_config_t Can_HashTable(uint16_t id);
 
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of global functions                 */
@@ -160,7 +160,7 @@ void CAN_Init_AppSerial(void)
 void Can_Send_Message(uint16_t txmessage_idx, uint8_t *data)
 {
     /* container to save the matching value from the hash table */
-    Can_Txmsg_Config local_value;
+    can_txmsg_config_t local_value;
     /* look using the hash table the corresponding data structure for a given message id */
     local_value = Can_HashTable(txmessage_idx);
 
@@ -193,10 +193,10 @@ IFX_INTERRUPT( CanIsr_RxHandler, 0, ISR_PRIORITY_CAN_RX )
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of private functions                */
 /*----------------------------------------------------------------------------*/
-static Can_Txmsg_Config Can_HashTable(uint16_t id)
+static can_txmsg_config_t Can_HashTable(uint16_t id)
 {
     /* container to save the matching value from the hash table */
-    Can_Txmsg_Config local_value = {0, NULL, NULL};
+    can_txmsg_config_t local_value = {0, NULL, NULL};
     /* flag to perform an early escape from the for loop */
     uint8_t flag = FALSE;
 
