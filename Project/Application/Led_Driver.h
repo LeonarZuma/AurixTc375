@@ -38,6 +38,8 @@ typedef struct Led_Driver
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
-void Led_Init(void);
+void Led_Init(uint8_t port, uint8_t pin_number);
+
+void Led_togglePin(uint8_t port, uint8_t pin_number);
 
 #endif
