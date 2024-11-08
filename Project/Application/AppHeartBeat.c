@@ -23,7 +23,7 @@ void AppHeartBeat_initTask(void)
 
 void AppHeartBeat_periodicTask(void)
 {
-
+    
 }
 
 /*----------------------------------------------------------------------------*/
