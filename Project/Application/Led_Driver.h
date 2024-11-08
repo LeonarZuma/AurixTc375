@@ -33,4 +33,6 @@
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
+void Led_Init(void);
+
 #endif

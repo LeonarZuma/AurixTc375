@@ -57,7 +57,6 @@ void AppClock_initTask( void )
 
 void AppClock_periodicTask( void )
 {
-
     App_Message data2Read;
 
     while (FALSE == AppQueue_isQueueEmpty(&ssm2rtcc_queue))
