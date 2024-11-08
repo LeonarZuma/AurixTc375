@@ -34,4 +34,8 @@
 /*                       Declaration of global functions                      */
 /*----------------------------------------------------------------------------*/
 
+void AppHeartBeat_initTask(void);
+
+void AppHeartBeat_periodicTask(void);
+
 #endif

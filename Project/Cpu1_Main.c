@@ -27,18 +27,17 @@
 #include <stdint.h>
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
-#include "IfxPort.h"
-#include "IfxPort_Io.h"
 #include "IfxStm.h"
 
 #include "Scheduler.h"
 #include "RTCC.h"
 #include "Queue.h"
+#include "AppHeartBeat.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
 #define TICK_VAL            (10U)       /* Tick Val 10ms */
-#define TASK1_VAL           (30U)        /* 5 times TickVal */
+#define TASK1_VAL           (30U)       /* Times TickVal */
 
 /*interrupt priority number for STM0 comparator 0*/
 
@@ -64,7 +63,7 @@ extern AppQue_Queue shared_queue;
 
 void core1_main(void)
 {
-    uint64 Timeout_100ms;
+    uint64 Timeout_300ms;
 
     /* Task ID creation */
     Sche_core1.tick = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM1, TICK_VAL );
@@ -78,10 +77,11 @@ void core1_main(void)
     AppSched_initScheduler(&Sche_core1);
 
     /*get the number of ticks corresponding to 1000ms*/
-    Timeout_100ms = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM1, (TICK_VAL * TASK1_VAL));
+    Timeout_300ms = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM1, (TICK_VAL * TASK1_VAL));
 
 
     /* no ponerle nombre de task a las funciones auxiliares de las tareas */
+    AppSched_registerTask(&Sche_core1, AppHeartBeat_initTask, AppHeartBeat_periodicTask, Timeout_300ms);
 
     /* !!WATCHDOG0 AND SAFETY WATCHDOG ARE DISABLED HERE!!
      * Enable the watchdogs and service them periodically if it is required */
@@ -96,7 +96,6 @@ void core1_main(void)
     priority of 10 */
 
     IfxCpu_enableInterrupts();
-
     
     AppSched_startScheduler(&Sche_core1);
 }
