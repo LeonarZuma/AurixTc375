@@ -23,7 +23,7 @@ void AppHeartBeat_initTask(void)
 
 void AppHeartBeat_periodicTask(void)
 {
-
+    Led_togglePin(PORT_00, PIN_5);
 }
 
 /*----------------------------------------------------------------------------*/
