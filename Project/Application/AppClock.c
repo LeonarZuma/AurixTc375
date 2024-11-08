@@ -31,6 +31,14 @@ static void AppClock_getTimeDate(App_TmTime *data);
 /*                     Implementation of global functions                     */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @brief   **Initialize Clock Application**
+ *
+ * Set Default time, data and alarm to initialize the rtcc and intialize a new can node to perform 
+ * can txransmission for the time and date.
+ *
+ * @note This is optional, just in case something very special needs to be take into account
+ */
 void AppClock_initTask( void )
 {
     /* Set the the corresponding Node Request for GPSR0 SR0 to service provider CPU0 with a priority of 10 */
