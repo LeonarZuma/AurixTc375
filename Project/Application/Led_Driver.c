@@ -2,8 +2,8 @@
 /*                                 Includes                                   */
 /*----------------------------------------------------------------------------*/
 #include <stdint.h>
-#include "Led_Driver.h"
 #include "IfxPort_Io.h"
+#include "Led_Driver.h"
 
 /*----------------------------------------------------------------------------*/
 /*                             Local data at RAM                              */
@@ -32,6 +32,7 @@ static ports_address_t port_table[] =
 /*----------------------------------------------------------------------------*/
 /*                      Definition of private functions                       */
 /*----------------------------------------------------------------------------*/
+static ports_address_t Led_HashTable_Search(uint16_t id);
 
 /*----------------------------------------------------------------------------*/
 /*                     Implementation of global functions                     */
@@ -39,16 +40,48 @@ static ports_address_t port_table[] =
 
 void Led_Init(uint8_t port, uint8_t pin_number)
 {
-    /*configure the pin 5 on port 00 as ouput pushpull */
-    IfxPort_setPinMode( &MODULE_P00, 5, IfxPort_Mode_outputPushPullGeneral );
+    ports_address_t pin_dir = {0, NULL};
+    /* search in the hash table the pin direcction equivalence by index */
+    pin_dir = Led_HashTable_Search(port);
+    /*configure the pin on port as ouput pushpull */
+    IfxPort_setPinMode(pin_dir.port_address, pin_number, IfxPort_Mode_outputPushPullGeneral );
     /*and cmos speed of 1*/
-    IfxPort_setPinPadDriver( &MODULE_P00, 5, IfxPort_PadDriver_cmosAutomotiveSpeed1 );
+    IfxPort_setPinPadDriver(pin_dir.port_address, pin_number, IfxPort_PadDriver_cmosAutomotiveSpeed1 );
 }
 
 void Led_togglePin(uint8_t port, uint8_t pin_number)
 {
-    IfxPort_togglePin( &MODULE_P00, 5);
+    ports_address_t pin_dir = {0, NULL};
+    /* search in the hash table the pin direcction equivalence by index */
+    pin_dir = Led_HashTable_Search(port);
+
+    IfxPort_togglePin(pin_dir.port_address, pin_number);
 }
 /*----------------------------------------------------------------------------*/
 /*                         Implementation of local functions                  */
 /*----------------------------------------------------------------------------*/
+static ports_address_t Led_HashTable_Search(uint16_t id)
+{
+    /* container to save the matching value from the hash table */
+    ports_address_t local_value = {0, NULL};
+    /* flag to perform an early escape from the for loop */
+    uint8_t flag = FALSE;
+
+    for(uint8_t index = 0; index < REG_PORT_ADDR && !flag; index++)
+    {
+        if(id == port_table[index].id)
+        {
+            local_value.id = port_table[index].id;
+            local_value.port_address = port_table[index].port_address;
+
+            /* Changing the flag state to perform an early escape from the for loop */
+            flag = TRUE;
+        }
+        else
+        {
+            /* do nothing */
+        }
+    }
+
+    return local_value;
+}

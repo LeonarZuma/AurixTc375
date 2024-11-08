@@ -4,6 +4,7 @@ TARGET = Test
 SRCS  = Cpu0_Main.c Cpu1_Main.c Cpu2_Main.c Bsp.c Assert.c sync_on_halt.c
 SRCS += Buffer.c Queue.c Scheduler.c Phase1.c RTCC.c
 SRCS += AppSerial.c AppClock.c Can_Driver.c Stm_Driver.c
+SRCS += Led_Driver.c AppHeartBeat.c
 SRCS += CompilerGcc.c CompilerDcc.c CompilerGhs.c CompilerGnuc.c CompilerTasking.c 
 SRCS += Ifx_Ssw_Infra.c Ifx_Ssw_Tc0.c Ifx_Ssw_Tc1.c Ifx_Ssw_Tc2.c Ifx_Cfg_Ssw.c Ifx_Cfg_SswBmhd.c
 SRCS += IfxPmsEvr.c IfxPmsPm.c IfxPms_PinMap.c
