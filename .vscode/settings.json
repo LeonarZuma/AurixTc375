@@ -7,6 +7,8 @@
         "app_bsp.h": "c",
         "ifxscuwdt.h": "c",
         "ifxport_io.h": "c",
-        "queue.h": "c"
+        "queue.h": "c",
+        "ifx_types.h": "c",
+        "led_driver.h": "c"
     }
 }
