@@ -34,11 +34,13 @@
 #include "Phase1.h"
 #include "Scheduler.h"
 #include "RTCC.h"
+#include "AppHeartBeat.h"
 
 #define TASKS_N             (3U)
 #define N_TIMERS            (3U)
 #define TICK_VAL            (10U)       /* Tick Val 10ms */
 #define TASK1_VAL           (10U)        /* 5 times TickVal */
+#define TASK2_VAL           (30U)        /* 5 times TickVal */
 
 /*interrupt priority number for STM0 comparator 0*/
 
@@ -64,6 +66,7 @@ extern IfxCpu_syncEvent g_cpuSyncEvent;
 void core2_main(void)
 {
     uint64 Timeout_100ms;
+    uint64 Timeout_300ms;
 
     /* Task ID creation */
     Sche_core2.tick = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM2, TICK_VAL );
@@ -78,8 +81,12 @@ void core2_main(void)
 
     /*get the number of ticks corresponding to 1000ms*/
     Timeout_100ms = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM2, (TICK_VAL * TASK1_VAL));
+    /*get the number of ticks corresponding to 1000ms*/
+    Timeout_300ms = (uint64)IfxStm_getTicksFromMilliseconds( &MODULE_STM2, (TICK_VAL * TASK2_VAL));
 
-    //AppSched_registerTask( &Sche_core2, Core2_Init_Task_100ms, Core2_Task_100ms, Timeout_100ms );
+
+    /* no ponerle nombre de task a las funciones auxiliares de las tareas */
+    AppSched_registerTask(&Sche_core2, AppHeartBeat_initTask, AppHeartBeat_periodicTask, Timeout_300ms);
 
     /* no ponerle nombre de task a las funciones auxiliares de las tareas */
 
