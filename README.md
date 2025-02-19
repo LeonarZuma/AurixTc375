@@ -1,7 +1,7 @@
 # AURIX TC375 tricore programming
 
 ### About The Project
-The main objective of this project was to create a fully functional scheduler multicore application to send, process and receive CAN messages to configure a Clock-like application. Setting alarm, time and date. The software architeture is a layer architecture with 2 main layers, Application and Base software.
+The main objective of this project was to create a fully functional scheduler multicore application to send, process and receive CAN messages to configure a Clock-like application. Setting alarm, time and date. The software architeture is a layer architecture with 2 main layers, Application and Base software (HL Drivers).
 
 
 ### Development Board
